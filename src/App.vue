@@ -55,6 +55,7 @@ $generalBtnFontColor:#696D6F;
   .wrapper{
     height: 100%;
     width: 100%;
+    min-width: 948px;
     background-color: $generalBgColor;
     border-radius: 8px;
     filter: drop-shadow(0px 0px 6px lightgray);
@@ -82,6 +83,7 @@ $generalBtnFontColor:#696D6F;
         font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         display: inline-flex;
         align-items: center;
+        filter: drop-shadow(0px 0px 2px $titleFontColor);
       }
       .help,.close{
         margin-top: 6px;
