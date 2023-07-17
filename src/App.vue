@@ -40,8 +40,8 @@ $unActiveSideBarBgColor:#4B5B6F;
 $unActiveSideBarIconColor:#78808D;
 $ActiveSideBarBgColor:#67788D;
 $ActiveSideBarIconColor:#FFFFFF;
-$mainBoxBgColorLeft:#F3F7F8;
-$mainBoxBgColorRight:#FFFFFF;
+$generalBtnBgColor:#FFFFFF;
+$generalBtnFontColor:#696D6F;
 .container{
   height: 100vh;
   width: 100vw;
@@ -49,8 +49,8 @@ $mainBoxBgColorRight:#FFFFFF;
   justify-items: center;
   align-items: center;
   padding: 6%;
-  padding-left: 12%;
-  padding-right: 12%;
+  padding-left: 16%;
+  padding-right: 16%;
   box-sizing: border-box;
   .wrapper{
     height: 100%;
@@ -146,6 +146,21 @@ $mainBoxBgColorRight:#FFFFFF;
         }
       }
     }
+  }
+}
+._general_btn{
+  transform: skewX(-12deg);
+  background-color: $generalBtnBgColor;
+  border-radius: 6px;
+  overflow: hidden;
+  padding: 6px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  color: $generalBtnFontColor !important;
+  filter: drop-shadow(-2px 3px 4px lightgray);
+  *{
+    transform: skewX(12deg);
   }
 }
 </style>
