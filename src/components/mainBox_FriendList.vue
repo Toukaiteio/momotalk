@@ -33,13 +33,29 @@
                             <div class="user_name">#username</div>
                             <div class="user_intro">#userintro</div>
                         </div>
-                        <div class="user_relation_lvl"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/></svg></div>
+                        <div class="user_relation_lvl"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/></svg><div class="font_front">12</div><div class="font_back">12</div></div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="_frinedList_FriendDetail_Wrapper">
-
+            <div class="detail_container">
+                <div class="detail_UserAvatar">
+                    <div class="avatar_container">
+                        <img src="../assets/temp_placeHolder_1.png">
+                        <div class="user_relation_lvl"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/></svg><div class="font_front">12</div><div class="font_back">12</div></div>
+                    </div>
+                    
+                    <div class="user_name">#username</div>
+                    <div class="user_intro">#userintro</div>
+                </div>
+                <div class="detail_effect_form">
+                    
+                </div>
+            </div>
+            <div class="detail_contianer" style="display: none;">
+                <!-- none select -->
+            </div>
         </div>
     </div>
 </template>
@@ -251,8 +267,7 @@ $userRelationDecorationOutlineColor:#E37DC8;
                             stroke-width: 22px;
                         }
                     }
-                    .user_relation_lvl::before{
-                            content: '12';
+                    .font_front{
                             display: block;
                             position: absolute;
                             width: 26px;
@@ -263,8 +278,7 @@ $userRelationDecorationOutlineColor:#E37DC8;
                             z-index: 33;
                             color:$mainBoxBgColorLeft;
                         }
-                    .user_relation_lvl::after{
-                        content:'12';
+                    .font_back{
                         display: block;
                         position: absolute;
                         width: 24px;
@@ -281,6 +295,90 @@ $userRelationDecorationOutlineColor:#E37DC8;
     }
     ._frinedList_FriendDetail_Wrapper{
         background-color: $mainBoxBgColorRight;
+        padding: 16px;
+        box-sizing: border-box;
+        .detail_container{
+            height: 100%;
+            width: 100%;
+            overflow-y: scroll;
+            .detail_UserAvatar{
+                height: 45%;
+                min-height: 200px;
+                max-height: 270px;
+                width: 100%;
+                // background-color: lightgreen;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                .user_name{
+                    width: 100%;
+                    text-align: center;
+                    color: $mainTitleFontColor;
+                    font-size: 24px;
+                    font-weight: 700;
+                }
+                .user_intro{
+                    width: 100%;
+                    font-size: 19px;
+                    font-weight: 600;
+                    text-align: center;
+                    color: $mainSubTitleFontColor;
+                }
+                .avatar_container{
+                    position: relative;
+                    height: 135px;
+                    width: 135px;
+                    img{
+                        height: 100%;
+                        width: 100%;
+                    }
+                    .user_relation_lvl{
+                        position: absolute;
+                        bottom: 0;
+                        right: 0;
+                        // transform: translateY(10%) translateX(10%);
+                        // aspect-ratio: 1.2 / 1;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 38px;
+                        svg{
+                            fill: $userRelationDecorationColor;
+                            stroke: $userRelationDecorationOutlineColor;
+                            stroke-width: 22px;
+                        }
+                    }
+                    .font_front{
+                            display: block;
+                            position: absolute;
+                            width: 26px;
+                            height: 26px;
+                            font-size: 18px;
+                            font-weight: 700;
+                            margin-left: 2%;
+                            z-index: 33;
+                            color:$mainBoxBgColorLeft;
+                        }
+                    .font_back{
+                        display: block;
+                        position: absolute;
+                        width: 24px;
+                        height: 24px;
+                        margin-left: 2%;
+                        font-size: 16px;
+                        font-weight: 700;
+                        z-index: 34;
+                        color: $mainTitleFontColor;
+                    }
+                }
+                
+            }
+
+        }
+        .detail_container::-webkit-scrollbar{
+            display: none;
+        }
     }
 }
 </style>
