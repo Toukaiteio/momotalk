@@ -1,4 +1,6 @@
 # momotalk
+对《蔚蓝档案》中momotalk的复刻，绝赞开发中。
+
 
 ## Project setup
 ```
