@@ -59,15 +59,20 @@
 </template>
 <script setup>
   import { reactive } from 'vue';
+  import { PageData } from './store';
+  const _PD=PageData();
   const PageStateObj=reactive({
     isDefaultPage:true,
-    onSelectStudentIndex:-1, //do remember set to -1 when page was changed
   })
+  if(localStorage.getItem("isup")!=null){
+    if(localStorage.getItem("isup")=="1"){
+      _PD.enableUnpullableStudent();
+    }
+  }
   const goPage=(_v)=>{
 
     if(PageStateObj.isDefaultPage!=_v){
       PageStateObj.isDefaultPage=_v;
-      PageStateObj.onSelectStudentIndex=-1;
     }
     console.log(PageStateObj.isDefaultPage)
   }

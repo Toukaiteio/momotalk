@@ -27,10 +27,10 @@
             </div>
             <div class="Main_body">
                 <div class="list_wrapper">
-                    <div class="list_item">
-                        <div class="user_avatar"><img src="../assets/temp_placeHolder_1.png" /></div>
+                    <div class="list_item" v-for="(item,index) in _PD.studentList" :key="index" :class="{selected:(index==PageState.onSelectIndex)}" @click="changeSelection(index)">
+                        <div class="user_avatar"><img :src="item.Avatar[0]" /></div>
                         <div class="user_detail">
-                            <div class="user_name">#username</div>
+                            <div class="user_name">{{item.Name}}</div>
                             <div class="user_lastchat">#userlastchat</div>
                         </div>
                     </div>
@@ -38,40 +38,63 @@
             </div>
         </div>
         <div class="_chatPage_ChatDetail_Wrapper">
-            <div class="chat_ContentContainer">
-                <div class="chat_BaseObject target">
+            <div class="chat_ContentContainer" v-if="PageState.onSelectIndex!=-1">
+                <!-- target self nohead image statetext -->
+                <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow" :key="chatindex"  :class="chatitem.type">
                     <div class="userAvatar">
-                        <img src="../assets/temp_placeHolder_1.png">
+                        <img v-if="chatitem.index!=-1" :src="_PD.studentList[chatitem.index].Avatar[0]">
                     </div>
                     <div class="userChatContent">
-                        <div class="userName">#userName</div>
+                        <div class="userName" v-if="chatitem.index!=-1">{{_PD.studentList[chatitem.index].Name}}</div>
                         <div class="Content">
                             <div class="decoration_triangle"></div>
-                            <div class="chat_Context">#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext</div>
+                            <div class="chat_Context">{{ chatitem.content }}</div>
                         </div>
                     </div>
                 </div>
-                <div class="chat_BaseObject self">
-                    <div class="userAvatar">
-                        <img src="../assets/temp_placeHolder_1.png">
-                    </div>
-                    <div class="userChatContent">
-                        <div class="userName">#userName</div>
-                        <div class="Content">
-                            <div class="decoration_triangle"></div>
-                            <div class="chat_Context">#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext#chatContext</div>
+            </div>
+        </div>
+        <div class="ControlBar" v-show="PageState.isShowControlBar" v-if="PageState.onSelectIndex!=-1">
+            <div class="_general_btn" @click="()=>{PageState.isShowCreator=true;}">
+                    为该角色创建对话
+                </div>
+            <div class="_general_btn" @click="_PD.enableUnpullableStudent" v-if="!_PD.isShowUnpullable">
+                    开启未实装角色
+            </div>
+            <div class="_general_btn" @click="_PD.disableUnpullableStudent" v-else>
+                    关闭未实装角色
+            </div>
+            <div class="_general_btn" @click="hideControlBar()">
+                隐藏控制栏    
+                <!-- 隐藏控制栏(双击此区域恢复显示) -->
+            </div>
+        </div>
+        <div class="ControlBar" v-show="!PageState.isShowControlBar" @click="showControlBar()"></div>
+    </div>
+    <div class="dialog_creator" v-show="PageState.isShowCreator">
+        <div class="window_wrapper">
+            <div class="header">
+               <div>STORY-CREATOR</div>
+               <div class="close" @click="()=>{PageState.isShowCreator=false;}"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></div>
+            </div>
+            <div class="mainbox">
+                <div class="inputer">
+                    <textarea placeholder="请输入对话代码" v-model="PageState.inputDialogData"></textarea>
+                </div>
+                <div class="btns">
+                    <div class="_general_btn">
+                        <div class="context">
+                            添加
                         </div>
                     </div>
-                </div>
-                <div class="chat_BaseObject self">
-                    <div class="userAvatar">
-                        <img src="../assets/temp_placeHolder_1.png">
-                    </div>
-                    <div class="userChatContent">
-                        <div class="userName">#userName</div>
-                        <div class="Content">
-                            <div class="decoration_triangle"></div>
-                            <div class="chat_Context">#chatContext#chaxt</div>
+                    <div class="_general_btn">
+                        <div class="context">
+                            替换
+                        </div>
+                        </div>
+                    <div class="_general_btn" @click="()=>{PageState.isShowCreator=false;}">
+                        <div class="context">
+                            取消
                         </div>
                     </div>
                 </div>
@@ -79,6 +102,80 @@
         </div>
     </div>
 </template>
+<script setup>
+import { PageData } from '../store';
+import { reactive } from 'vue';
+const PageState=reactive({
+    onSelectIndex:-1,
+    onSelectStudentData:{},
+    preChatFlow:[{
+        "type":"target",
+        "content":"你好",
+        "sid":"10000",
+        "slIndex":"0",
+        "delay":"normal" // slow normal fast (default is normal)
+    }],
+    onChatFlow:[
+        {
+            "type":"target",
+            "content":"你好",
+            "index":0,
+        },
+        {
+            "type":"target",
+            "content":"再见",
+            "index":0,
+        },
+        {
+            "type":"self",
+            "content":"?",
+            "index":0,
+        },
+        {
+            "type":"statetext",
+            "content":"以上为历史消息",
+            "index":-1,
+        }
+    ],
+    isShowControlBar:true,
+    isShowCreator:false,
+    identity:false,
+    mouseClickTimes:0,
+    inputDialogData:'',
+    unreadMessageNumberList:[],
+
+})
+const _PD=PageData();
+//initail Student Data
+for(let i of _PD.studentList){
+    if(localStorage.getItem(`${i.Id}_unread`)==null){
+        localStorage.setItem(`${i.Id}_unread`,JSON.stringify([]));
+    }
+    PageState.unreadMessageNumberList.push(JSON.parse(localStorage.getItem(`${i.Id}_unread`)));
+    if(localStorage.getItem(`${i.Id}_message`)==null){
+        localStorage.setItem(`${i.Id}_message`,JSON.stringify([]));
+    }
+    PageState.unreadMessageNumberList.push(JSON.parse(localStorage.getItem(`${i.Id}_message`)));
+}
+//init end
+const changeSelection=(_i)=>{
+    PageState.onSelectIndex=_i;
+    PageState.onSelectStudentData=_PD.studentList[_i];
+    // console.log(PageState.onSelectIndex);
+}
+const hideControlBar=()=>{
+    PageState.isShowControlBar=false;
+}
+const showControlBar=()=>{
+    PageState.mouseClickTimes+=1
+    if(PageState.mouseClickTimes>=2){
+        PageState.isShowControlBar=true;
+        PageState.mouseClickTimes=0;
+    }else{
+        setTimeout(()=>{PageState.mouseClickTimes=0},700);
+    }
+}
+</script>
 <style lang="scss" scoped>
 $mainBoxBgColorLeft:#F3F7F8;
 $mainBoxBgColorRight:#FFFFFF;
@@ -91,10 +188,112 @@ $insertDecorationColor:#2BC5FE;
 $chatBubbleTargetBgColor:#4C5B6F;
 $chatBubbleSelfBgColor:#4A8ACA;
 $chatFontColor:#F4F5F6;
+$creatorCoverBgColor:#f3f7f836;
+$windowBarBgColor:#FC8DA2;
+$titleFontColor:#FFFFFF;
+.dialog_creator{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    background-color: $creatorCoverBgColor;
+    backdrop-filter: blur(3px);
+    padding: 64px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .window_wrapper{
+        height: 100%;
+        width: 600px;
+        background-color: $mainBoxBgColorLeft;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        .header{
+            width: 100%;
+            height: 64px;
+            background-color: $windowBarBgColor;
+            display: flex;
+            align-items: center;
+            color: $titleFontColor;
+            padding: 12px;
+            padding-left: 24px;
+            padding-right: 24px;
+            box-sizing: border-box;
+            filter: drop-shadow(0px 0px 2px $titleFontColor);
+            user-select: none;
+            font-size: 33px;
+            font-weight: bolder;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            svg{
+                fill: $titleFontColor;
+            }
+            .close{
+                flex: 1;
+                width: 0;
+                margin-top: 6px;
+                font-size: 44px;
+                font-weight: bolder;
+                width: 20%;
+                text-align: right;
+                color: inherit;
+            }
+        }
+        .mainbox{
+            flex:1;
+            height: 0;
+            width: 100%;
+            padding: 16px;
+            box-sizing: border-box;
+            .inputer{
+                height: 85%;
+                width: 100%;
+                border-radius: 8px;
+                overflow: hidden;
+                border: 1px solid gray;
+                textarea{
+                    height: 100%;
+                    width: 100%;
+                    outline: none;
+                    border: none;
+                    font-size: 14px;
+                    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                    padding: 8px;
+                    box-sizing: border-box;
+                    background-color: litghten($mainBoxBgColorLeft);
+                }
+            }
+            .btns{
+                height: 15%;
+                width: 100%;
+                display: inline-flex;
+                justify-content: space-evenly;
+                padding: 12px;
+                box-sizing: border-box;
+                ._general_btn{
+                    padding-left: 16px;
+                    padding-right: 16px;
+                    box-sizing: border-box;
+                }
+                .context{
+                    transform: skewX(-12px);
+                    color: $mainTitleFontColor;
+                    font-size: 20px;
+
+                }
+            }
+        }
+    }
+    // background-color: #2BC5FE;
+}
 ._chatPage_Container{
     width: 100%;
     height: 100%;
     display: inline-flex;
+    position: relative;
     ._chatPage_Main_Wrapper,._chatPage_ChatDetail_Wrapper{
         width: 50%;
         height: 100%;
@@ -159,6 +358,7 @@ $chatFontColor:#F4F5F6;
                     padding-left: 16px;
                     box-sizing: border-box;
                     height: 100%;
+                    
                     display: inline-flex;
                     align-items: center;
                     transform: skewX(0deg);
@@ -221,9 +421,13 @@ $chatFontColor:#F4F5F6;
             flex: 1;
             width: 100%;
             height: 0px;
+            .list_wrapper::-webkit-scrollbar{
+                display: none;
+            }
             .list_wrapper{
                 height: 100%;
                 width: 100%;
+                overflow-y: scroll;
                 background-color: $mainBoxBgColorLeft;
                 .list_item.selected{
                     background-color: $mainListActiveColor !important;
@@ -272,6 +476,11 @@ $chatFontColor:#F4F5F6;
                             font-size: 19px;
                             font-weight: 600;
                             color: $mainSubTitleFontColor;
+                            word-break: keep-all;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            padding-bottom: 2px;
                         }
                     }
                 }
@@ -297,14 +506,26 @@ $chatFontColor:#F4F5F6;
                 width: 100%;
                 // background-color: #2BC5FE;
                 .userAvatar{
-                    height: 75px;
-                    width: 75px;
-                    border-radius: 75px;
+                    height: 65px;
+                    width: 65px;
+                    border-radius: 65px;
                     overflow: hidden;
                     img{
                         height: 100%;
                         width: 100%;
                         object-fit: cover;
+                    }
+                }
+                .userImageContent{
+                    display: none;
+                    height: 280px;
+                    width: 280px;
+                    padding: 6px;
+                    box-sizing: border-box;
+                    img{
+                        height: 100%;
+                        width: 100%;
+                        object-fit: contain;
                     }
                 }
                 .userChatContent{
@@ -313,12 +534,12 @@ $chatFontColor:#F4F5F6;
                     .userName{
                             width: 100%;
                             color: $mainTitleFontColor;
-                            font-size: 24px;
+                            font-size: 20px;
                             font-weight: 700;
                     }
                     .Content{
                         width: 100%;
-                        font-size: 24px;
+                        font-size: 22px;
                         color: $chatFontColor;
                         position: relative;
                         display: flex;
@@ -335,11 +556,53 @@ $chatFontColor:#F4F5F6;
                             // width: 0;
                             
                             border-radius: 12px;
-                            padding: 6px;
+                            padding: 12px;
+                            padding-top: 6px !important;
+                            padding-bottom: 6px !important;
                             box-sizing: border-box;
                             word-break: break-all;
                         }
                     }
+                }
+            }
+            .chat_BaseObject.nohead{
+                .userAvatar{
+                    opacity: 0;
+                }
+                .userChatContent{
+                    .userName{
+                        opacity: 0;
+                    }
+                }
+            }
+            .chat_BaseObject.statetext{
+                .userAvatar{
+                    display: none;
+                }
+                .userChatContent{
+                    .userName{
+                        display: none;
+                    }
+                    .chat_Context{
+                        width: 100%;
+                        text-align: center;
+                        font-size: 24px;
+                        font-weight: 600;
+                        color: $chatBubbleTargetBgColor;
+                        word-break: break-all;
+                        padding-left: 32px;
+                        padding-right: 32px;
+                        box-sizing: border-box;
+                        }
+                }
+                
+            }
+            .chat_BaseObject.image{
+                .chat_Context,.decoration_triangle{
+                    display: none;
+                }
+                .userImageContent{
+                    display: initial;
                 }
             }
             .chat_BaseObject.target{
@@ -365,7 +628,7 @@ $chatFontColor:#F4F5F6;
                         .chat_Context{
                             background-color: $chatBubbleTargetBgColor;
                             border-radius: 12px;
-                            padding: 6px;
+                            padding: 12px;
                             box-sizing: border-box;
                             word-break: break-all;
                         }
@@ -405,7 +668,7 @@ $chatFontColor:#F4F5F6;
                         .chat_Context{
                             background-color: $chatBubbleSelfBgColor;
                             border-radius: 12px;
-                            padding: 6px;
+                            padding: 12px;
                             box-sizing: border-box;
                             word-break: break-all;
                         }
@@ -416,6 +679,21 @@ $chatFontColor:#F4F5F6;
             display: none;
         }
         
+    }
+    .ControlBar{
+        position: absolute;
+        width: 50%;
+        right: 0;
+        bottom: 0;
+        height: 60px;
+        padding: 6px;
+        padding-left: 12px;
+        padding-right: 12px;
+        box-sizing: border-box;
+        background-color: transparent;
+        color: $mainTitleFontColor !important;
+        display: inline-flex;
+        justify-content: space-evenly;
     }
 }
 </style>
