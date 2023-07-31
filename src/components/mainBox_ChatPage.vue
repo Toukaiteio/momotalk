@@ -31,25 +31,29 @@
                         <div class="user_avatar"><img :src="item.Avatar[0]" /></div>
                         <div class="user_detail">
                             <div class="user_name">{{item.Name}}</div>
-                            <div class="user_lastchat">#userlastchat</div>
+                            <div class="user_lastchat">角色ID:{{index}}</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="_chatPage_ChatDetail_Wrapper">
-            <div class="chat_ContentContainer" v-if="PageState.onSelectIndex!=-1">
+            <div class="chat_ContentContainer" v-if="PageState.onSelectIndex!=-1 && PageState.onChatFlow.length>0">
                 <!-- target self nohead image statetext -->
-                <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow" :key="chatindex"  :class="chatitem.type">
+                <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
                     <div class="userAvatar">
-                        <img v-if="chatitem.index!=-1" :src="_PD.studentList[chatitem.index].Avatar[0]">
+                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.studentList[parseInt(chatitem.slIndex)].Avatar[0]">
                     </div>
-                    <div class="userChatContent">
-                        <div class="userName" v-if="chatitem.index!=-1">{{_PD.studentList[chatitem.index].Name}}</div>
+                    <div class="userChatContent" v-if="chatitem.type.indexOf('image')==-1">
+                        <div class="userName" v-if="parseInt(chatitem.slIndex)>-1">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
                         <div class="Content">
                             <div class="decoration_triangle"></div>
                             <div class="chat_Context">{{ chatitem.content }}</div>
                         </div>
+                    </div>
+                    <div class="userImageContent" v-if="chatitem.type.indexOf('image')!=-1">
+                        <div class="userName">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
+                        <img :src="chatitem.content">
                     </div>
                 </div>
             </div>
@@ -75,9 +79,77 @@
         <div class="window_wrapper">
             <div class="header">
                <div>STORY-CREATOR</div>
-               <div class="close" @click="()=>{PageState.isShowCreator=false;}"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></div>
+               <div class="close" @click="()=>{PageState.isShowCreator=false;}"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></div>
             </div>
             <div class="mainbox">
+                <div class="inputer_wrapper">
+                    <div class="inputer_block chat_detail" v-if="PageState.preChatFlow.length>0">
+                        <div class="obj_container" v-for="(_item,_index) in PageState.preChatFlow" :key="_index" :class="{selected:_index==PageState.preChatOnSelected}" @click="hardChangeSelect(_index)">
+                            <div class="bas_obj" :class="_item.type" v-if="_item.type.indexOf('image')==-1">{{_item.content}}</div> 
+                            <div class="bas_obj" :class="_item.type" v-else>
+                                [图片:{{_item.content}}]
+                            </div> 
+                        </div>
+                        <!-- <div class="obj_container">
+                            <div class="bas_obj self">#Self</div>    
+                        </div> -->
+                    </div>
+                    <div class="inputer_block chat_detail" v-if="PageState.preChatFlow.length<=0">
+                        尝试点击 【新建】 来创建一段对话吧~
+                    </div>
+                    <div class="inputer_block fun_btns">
+                        <div class="_general_btn" @click="changeSelected(0)">
+                            <div class="context">
+                                选中上一个
+                            </div>
+                        </div>
+                        <div class="_general_btn" @click="changeSelected(1)">
+                            <div class="context">
+                                选中下一个
+                            </div>
+                        </div>
+                        <div class="_general_btn" @click="copyOnSelecting()">
+                            <div class="context">
+                                复制
+                            </div>
+                        </div>
+                        <div class="_general_btn" @click="addOnSelecting()">
+                            <div class="context">
+                                新建
+                            </div>
+                        </div>
+                        <div class="_general_btn" @click="deleteOnSelecting()">
+                            <div class="context">
+                                删除
+                            </div>
+                        </div>
+                    </div>
+                    <div class="inputer_block config">
+                        <div class="inputer_item" v-if="PageState.preChatFlow.length>0">内容: <input type="text" v-model="PageState.preChatFlow[PageState.preChatOnSelected].content" /> </div>
+                        <div class="inputer_item" v-if="PageState.preChatFlow.length>0">类型: <input type="text" v-model="PageState.preChatFlow[PageState.preChatOnSelected].type"/> </div>
+                        <div class="inputer_item" v-if="PageState.preChatFlow.length>0">角色: <input type="text" v-model="PageState.preChatFlow[PageState.preChatOnSelected].slIndex"/> </div>
+                        <div class="inputer_item" v-if="PageState.preChatFlow.length>0">延迟: <input type="text" v-model="PageState.preChatFlow[PageState.preChatOnSelected].delay"/> </div>
+                    </div>
+                </div>
+                <div class="btns">
+                    <div class="_general_btn">
+                        <div class="context" @click="()=>{PageState.onChatFlow=PageState.preChatFlow;PageState.isShowCreator=false;}">
+                            确定
+                        </div>
+                    </div>
+                    <div class="_general_btn" @click="chatReset();">
+                        <div class="context">
+                            重置
+                        </div>
+                        </div>
+                    <div class="_general_btn" @click="()=>{PageState.isShowCreator=false;}">
+                        <div class="context">
+                            取消
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="mainbox">
                 <div class="inputer">
                     <textarea placeholder="请输入对话代码" v-model="PageState.inputDialogData"></textarea>
                 </div>
@@ -98,7 +170,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -108,35 +180,17 @@ import { reactive } from 'vue';
 const PageState=reactive({
     onSelectIndex:-1,
     onSelectStudentData:{},
-    preChatFlow:[{
-        "type":"target",
-        "content":"你好",
-        "sid":"10000",
-        "slIndex":"0",
-        "delay":"normal" // slow normal fast (default is normal)
-    }],
-    onChatFlow:[
-        {
-            "type":"target",
-            "content":"你好",
-            "index":0,
-        },
-        {
-            "type":"target",
-            "content":"再见",
-            "index":0,
-        },
-        {
-            "type":"self",
-            "content":"?",
-            "index":0,
-        },
-        {
-            "type":"statetext",
-            "content":"以上为历史消息",
-            "index":-1,
-        }
-    ],
+    preChatFlow:[
+    {
+        "type":"statetext",
+        "content":"请在此处输入内容",
+        "sid":"-1",
+        "slIndex":"-1",
+        "delay":"normal"
+    }
+],
+    preChatOnSelected:0,
+    onChatFlow:[],
     isShowControlBar:true,
     isShowCreator:false,
     identity:false,
@@ -144,7 +198,68 @@ const PageState=reactive({
     inputDialogData:'',
     unreadMessageNumberList:[],
 
-})
+});
+const hardChangeSelect=(n)=>{
+    if(n>=0 && n<PageState.preChatFlow.length){
+        PageState.preChatOnSelected=n;
+    }
+}
+
+const changeSelected=(met)=>{
+    if(met){
+        if(PageState.preChatOnSelected+1<PageState.preChatFlow.length){
+            PageState.preChatOnSelected+=1;
+        }
+    }else{
+        if(PageState.preChatOnSelected-1>=0){
+            PageState.preChatOnSelected-=1;
+        }
+    }
+    
+}
+const copyOnSelecting=()=>{
+    const tempA=PageState.preChatFlow.slice(0,PageState.preChatOnSelected+1);
+    const tempB=PageState.preChatFlow.slice(PageState.preChatOnSelected+1);
+    PageState.preChatFlow=tempA.concat([PageState.preChatFlow[PageState.preChatOnSelected],...tempB]);
+    changeSelected(1);
+}
+const deleteOnSelecting=()=>{
+    const tempA=PageState.preChatFlow.slice(0,PageState.preChatOnSelected);
+    const tempB=PageState.preChatFlow.slice(PageState.preChatOnSelected+1);
+    PageState.preChatFlow=tempA.concat(tempB);
+}
+const addOnSelecting=()=>{
+    const tempA=PageState.preChatFlow.slice(0,PageState.preChatOnSelected+1);
+    const tempB=PageState.preChatFlow.slice(PageState.preChatOnSelected+1);
+    PageState.preChatFlow=tempA.concat([{
+        "type":"statetext",
+        "content":"请在此处输入内容",
+        "sid":"-1",
+        "slIndex":"-1",
+        "delay":"normal"
+    },...tempB]);
+    changeSelected(1);
+}
+const isNohead=(type,index)=>{
+    if(index==0 || type.indexOf('self')!=-1 || type.indexOf('image')!=-1 || type.indexOf('statetext') != -1){
+        return type;
+    }else{
+        if(PageState.onChatFlow[index-1].type.indexOf('target')!=-1 && PageState.onChatFlow[index].slIndex==PageState.onChatFlow[index-1].slIndex && PageState.onChatFlow[index-1].type.indexOf('image')==-1){
+            return type+" nohead";
+        }else{
+            return type;
+        }
+    }
+}
+const chatReset=()=>{
+    PageState.preChatFlow=[{
+        "type":"statetext",
+        "content":"请在此处输入内容",
+        "sid":"-1",
+        "slIndex":"-1",
+        "delay":"normal"
+    }]
+}
 const _PD=PageData();
 //initail Student Data
 for(let i of _PD.studentList){
@@ -206,7 +321,7 @@ $titleFontColor:#FFFFFF;
     align-items: center;
     .window_wrapper{
         height: 100%;
-        width: 600px;
+        width: 900px;
         background-color: $mainBoxBgColorLeft;
         border-radius: 8px;
         overflow: hidden;
@@ -248,6 +363,95 @@ $titleFontColor:#FFFFFF;
             width: 100%;
             padding: 16px;
             box-sizing: border-box;
+            .inputer_wrapper{
+                width: 100%;
+                height: 85%;
+                display: flex;
+                justify-content: space-between;
+                .inputer_block{
+                    width: 33%;
+                    height: 100%;
+                    border: 1px solid black;
+                }
+                .fun_btns{
+                    padding-left: 16px;
+                    padding-right: 16px;
+                    box-sizing: border-box;
+                    overflow-x: hidden;
+                    overflow-y: scroll;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    ._general_btn{
+                        padding-left: 16px;
+                        padding-right: 16px;
+                        box-sizing: border-box;
+                    }
+                    .context{
+                        transform: skewX(-12px);
+                        color: $mainTitleFontColor;
+                        font-size: 20px;
+                    }
+                }
+                .config{
+                    padding: 8px;
+                    box-sizing: border-box;
+                    .inputer_item{
+                        height: 22px;
+                        width: 100%;
+                        display: flex;
+                        input{
+                            flex: 1;
+                            width: 0;
+                            height: 100%;
+                        }
+                        margin-bottom: 6px;
+                    }
+                }
+                
+                .fun_btns::-webkit-scrollbar,.chat_detail::-webkit-scrollbar{
+                    display: none;
+                }
+                .chat_detail{
+                    overflow-x: hidden;
+                    overflow-y: scroll;
+                    .obj_container{
+                        height: 32px;
+                        width: 100%;
+                    }
+                    .obj_container.selected{
+                        background-color: $windowBarBgColor;
+                    }
+                    .bas_obj.target{
+                        padding-left: 8px;
+                        padding-right: 26px;
+                        background-color: $chatBubbleTargetBgColor;
+                        color: $chatFontColor;
+                        float: left;
+                    }
+                    .bas_obj.self{
+                        padding-right: 8px;
+                        padding-left: 26px;
+                        background-color: $chatBubbleSelfBgColor;
+                        color: $chatFontColor;
+                        float: right;
+                    }
+                    .bas_obj.statetext{
+                        width: 100%;
+                        text-align: center;
+                        color: $mainTitleFontColor;
+                    }
+                    .bas_obj{
+                        // width: 100%;
+                        height: 32px;
+                        line-height: 32px;
+                        vertical-align: middle;
+                        border-radius: 4px;
+                        overflow: hidden;
+                        box-sizing: border-box;
+                    }
+                }
+            }
             .inputer{
                 height: 85%;
                 width: 100%;
@@ -566,13 +770,17 @@ $titleFontColor:#FFFFFF;
                 }
             }
             .chat_BaseObject.nohead{
+                margin-top: 12px !important;
                 .userAvatar{
                     opacity: 0;
                 }
                 .userChatContent{
                     .userName{
-                        opacity: 0;
+                        display: none;
                     }
+                }
+                .decoration_triangle{
+                    opacity: 0;
                 }
             }
             .chat_BaseObject.statetext{
