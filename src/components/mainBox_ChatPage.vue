@@ -1,5 +1,5 @@
 <template>
-    <div class="_chatPage_Container">
+    <div class="_chatPage_Container" :class="{notShot:!PageState.isScreenShotting,shot:PageState.isScreenShotting}">
         <div class="_chatPage_Main_Wrapper">
             <div class="Main_header">
                 <div class="item_left">未读消息(0)</div>
@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="_chatPage_ChatDetail_Wrapper">
-            <div class="chat_ContentContainer" v-if="PageState.onSelectIndex!=-1 && PageState.onChatFlow.length>0">
+            <div class="chat_ContentContainer"  v-if="PageState.onSelectIndex!=-1 && PageState.onChatFlow.length>0">
                 <!-- target self nohead image statetext -->
                 <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
                     <div class="userAvatar">
@@ -68,12 +68,35 @@
             <div class="_general_btn" @click="_PD.disableUnpullableStudent" v-else>
                     关闭未实装角色
             </div>
+            <div class="_general_btn" @click="exportToImage()">
+                    导出图片
+            </div>
             <div class="_general_btn" @click="hideControlBar()">
                 隐藏控制栏    
                 <!-- 隐藏控制栏(双击此区域恢复显示) -->
             </div>
         </div>
         <div class="ControlBar" v-show="!PageState.isShowControlBar" @click="showControlBar()"></div>
+        <div class="screenShotEl" :class="{notShot:!PageState.isScreenShotting,shot:PageState.isScreenShotting}" id="chatBox"  v-if="PageState.onSelectIndex!=-1 && PageState.onChatFlow.length>0">
+                <!-- target self nohead image statetext -->
+                <div class="ads">由momotalk模拟器生成,项目地址:https://github.com/Toukaiteio/my_momotalk</div>
+                <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
+                    <div class="userAvatar">
+                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.studentList[parseInt(chatitem.slIndex)].Avatar[0]">
+                    </div>
+                    <div class="userChatContent" v-if="chatitem.type.indexOf('image')==-1">
+                        <div class="userName" v-if="parseInt(chatitem.slIndex)>-1">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
+                        <div class="Content">
+                            <div class="decoration_triangle"></div>
+                            <div class="chat_Context">{{ chatitem.content }}</div>
+                        </div>
+                    </div>
+                    <div class="userImageContent" v-if="chatitem.type.indexOf('image')!=-1">
+                        <div class="userName">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
+                        <img :src="chatitem.content">
+                    </div>
+                </div>
+            </div>
     </div>
     <div class="dialog_creator" v-show="PageState.isShowCreator">
         <div class="window_wrapper">
@@ -172,11 +195,14 @@
                 </div>
             </div> -->
         </div>
+        
     </div>
+
 </template>
 <script setup>
 import { PageData } from '../store';
 import { reactive } from 'vue';
+import domToImage from 'dom-to-image';
 const PageState=reactive({
     onSelectIndex:-1,
     onSelectStudentData:{},
@@ -197,7 +223,7 @@ const PageState=reactive({
     mouseClickTimes:0,
     inputDialogData:'',
     unreadMessageNumberList:[],
-
+    isScreenShotting:false,
 });
 const hardChangeSelect=(n)=>{
     if(n>=0 && n<PageState.preChatFlow.length){
@@ -220,7 +246,13 @@ const changeSelected=(met)=>{
 const copyOnSelecting=()=>{
     const tempA=PageState.preChatFlow.slice(0,PageState.preChatOnSelected+1);
     const tempB=PageState.preChatFlow.slice(PageState.preChatOnSelected+1);
-    PageState.preChatFlow=tempA.concat([PageState.preChatFlow[PageState.preChatOnSelected],...tempB]);
+    PageState.preChatFlow=tempA.concat([{
+        "type":PageState.preChatFlow[PageState.preChatOnSelected].type,
+        "content":PageState.preChatFlow[PageState.preChatOnSelected].content,
+        "sid":PageState.preChatFlow[PageState.preChatOnSelected].sid,
+        "slIndex":PageState.preChatFlow[PageState.preChatOnSelected].slIndex,
+        "delay":PageState.preChatFlow[PageState.preChatOnSelected].delay,
+    },...tempB]);
     changeSelected(1);
 }
 const deleteOnSelecting=()=>{
@@ -250,6 +282,19 @@ const isNohead=(type,index)=>{
             return type;
         }
     }
+}
+const exportToImage=()=>{
+    PageState.isScreenShotting=true;
+    domToImage.toPng(document.getElementById('chatBox'))
+      .then(function(dataUrl){
+        const fileLink = document.createElement('a');
+        fileLink.href = dataUrl;
+        const nowtime=new Date();
+        fileLink.setAttribute('download',"导出的图片-momotalk-github_Toukaiteio-ts_"+nowtime.getTime()+".png");
+        document.body.appendChild(fileLink);
+        fileLink.click();
+        PageState.isScreenShotting=false;
+      })
 }
 const chatReset=()=>{
     PageState.preChatFlow=[{
@@ -363,6 +408,7 @@ $titleFontColor:#FFFFFF;
             width: 100%;
             padding: 16px;
             box-sizing: border-box;
+            overflow-y: hidden;
             .inputer_wrapper{
                 width: 100%;
                 height: 85%;
@@ -493,11 +539,18 @@ $titleFontColor:#FFFFFF;
     }
     // background-color: #2BC5FE;
 }
+._chatPage_Container.notShot{
+    overflow: hidden;
+}
+._chatPage_Container.shot{
+    overflow: visible;
+}
 ._chatPage_Container{
     width: 100%;
     height: 100%;
     display: inline-flex;
     position: relative;
+    
     ._chatPage_Main_Wrapper,._chatPage_ChatDetail_Wrapper{
         width: 50%;
         height: 100%;
@@ -697,6 +750,7 @@ $titleFontColor:#FFFFFF;
         padding-left: 12px;
         padding-right: 12px;
         .chat_ContentContainer{
+            background-color: $mainBoxBgColorRight;
             height: 100%;
             width: 100%;
             padding-top: 12px;
@@ -903,5 +957,206 @@ $titleFontColor:#FFFFFF;
         display: inline-flex;
         justify-content: space-evenly;
     }
+    .screenShotEl.notShot{
+        position: absolute;
+        top: 5000px;
+        left: -5000px;
+    }
+    .screenShotEl.shot{
+        position: relative;
+    }
+    .screenShotEl{
+        
+        background-color: $mainBoxBgColorRight;
+        width: 650px;
+        height: fit-content;
+        .ads{
+            word-break: break-all;
+            word-wrap: break-word;
+            color: white;
+            filter: drop-shadow(0px 0px 2px lightgray);
+        }
+        .chat_BaseObject{
+            background-color: $mainBoxBgColorRight;
+            margin-top: 22px;
+            // height: 135px;
+            display: flex;
+            width: 100%;
+            // background-color: #2BC5FE;
+            .userAvatar{
+                height: 65px;
+                width: 65px;
+                border-radius: 65px;
+                overflow: hidden;
+                img{
+                    height: 100%;
+                    width: 100%;
+                    object-fit: cover;
+                }
+            }
+            .userImageContent{
+                display: none;
+                height: 280px;
+                width: 280px;
+                padding: 6px;
+                box-sizing: border-box;
+                img{
+                    height: 100%;
+                    width: 100%;
+                    object-fit: contain;
+                }
+            }
+            .userChatContent{
+
+                flex: 1;
+                width: 0;
+                .userName{
+                        width: 100%;
+                        color: $mainTitleFontColor;
+                        font-size: 20px;
+                        font-weight: 700;
+                }
+                .Content{
+                    width: 100%;
+                    font-size: 22px;
+                    color: $chatFontColor;
+                    position: relative;
+                    display: flex;
+                    box-sizing: border-box;
+                    .decoration_triangle{
+                        position: absolute;
+                        width: 0;
+                        height: 0;
+                        top: 12px;
+                        
+                    }
+                    .chat_Context{
+                        // flex: 1;
+                        // width: 0;
+                        
+                        border-radius: 12px;
+                        padding: 12px;
+                        padding-top: 6px !important;
+                        padding-bottom: 6px !important;
+                        box-sizing: border-box;
+                        word-break: break-all;
+                    }
+                }
+            }
+        }
+        .chat_BaseObject.nohead{
+            margin-top: 12px !important;
+            .userAvatar{
+                opacity: 0;
+            }
+            .userChatContent{
+                .userName{
+                    display: none;
+                }
+            }
+            .decoration_triangle{
+                opacity: 0;
+            }
+        }
+        .chat_BaseObject.statetext{
+            .userAvatar{
+                display: none;
+            }
+            .userChatContent{
+                .userName{
+                    display: none;
+                }
+                .chat_Context{
+                    width: 100%;
+                    text-align: center;
+                    font-size: 24px;
+                    font-weight: 600;
+                    color: $chatBubbleTargetBgColor;
+                    word-break: break-all;
+                    padding-left: 32px;
+                    padding-right: 32px;
+                    box-sizing: border-box;
+                    }
+            }
+            
+        }
+        .chat_BaseObject.image{
+            .chat_Context,.decoration_triangle{
+                display: none;
+            }
+            .userImageContent{
+                display: initial;
+            }
+        }
+        .chat_BaseObject.target{
+            .userChatContent{
+                
+                .userName{
+                    padding-left: 7px;
+                    box-sizing: border-box;
+                    text-align: left;
+                }
+            }
+            .Content{
+                // text-align: right;
+                padding-left: 8px;
+                padding-right: 24px;
+                .decoration_triangle{
+                        left: -4px;
+                        border:12px solid $chatBubbleTargetBgColor;
+                        border-bottom:4px solid transparent;
+                        border-top:4px solid transparent;
+                        border-left:1px solid transparent;
+                    }
+                    .chat_Context{
+                        background-color: $chatBubbleTargetBgColor;
+                        border-radius: 12px;
+                        padding: 12px;
+                        box-sizing: border-box;
+                        word-break: break-all;
+                    }
+            }
+        }
+        .chat_BaseObject.self{
+            flex-direction: row-reverse;
+            .userAvatar{
+                display: none;
+            }
+            .userChatContent{
+                .userName{
+                    display: none;
+                    // padding-right: 7px;
+                    // box-sizing: border-box;
+                    // text-align: right;
+                }
+            }
+            
+            .Content{
+                padding-right: 8px;
+                padding-left: 24px;
+                flex-direction: row-reverse;
+                // text-align: right;
+                .decoration_triangle{
+                        position: absolute;
+                        width: 0;
+                        height: 0;
+                        top: 12px;
+                        right: -4px;
+                        border:12px solid $chatBubbleSelfBgColor;
+                        border-bottom:4px solid transparent;
+                        border-top:4px solid transparent;
+                        border-right:1px solid transparent;
+                        border-left: 12px solid $chatBubbleSelfBgColor;
+                    }
+                    .chat_Context{
+                        background-color: $chatBubbleSelfBgColor;
+                        border-radius: 12px;
+                        padding: 12px;
+                        box-sizing: border-box;
+                        word-break: break-all;
+                    }
+            }
+        }
+        }
 }
 </style>

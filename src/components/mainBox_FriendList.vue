@@ -83,6 +83,8 @@ const changeSelection=(_i)=>{
     PageState.onSelectStudentData=_PD.studentList[_i];
     // console.log(PageState.onSelectIndex);
 }
+// alert(_PD.studentList);
+// console.log(_PD.studentList);
 </script>
 <style lang="scss" scoped>
 $mainBoxBgColorLeft:#F3F7F8;

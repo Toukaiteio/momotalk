@@ -1,21 +1,22 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createMemoryHistory } from 'vue-router'
 // import HomeView from '../views/HomeView.vue'
-
+import Flist from '../components/mainBox_FriendList.vue'
+import Clist from '../components/mainBox_ChatPage.vue'
 const routes = [
   {
     path: '/',
     name: 'friendList',
-    component: import('../components/mainBox_FriendList.vue')
+    component: Flist
   },
   {
     path: '/c',
     name: 'chatPage',
-    component: import('../components/mainBox_ChatPage.vue')
+    component: Clist
   }
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(process.env.BASE_URL),
+  history: createMemoryHistory(process.env.BASE_URL),
   routes
 })
 
