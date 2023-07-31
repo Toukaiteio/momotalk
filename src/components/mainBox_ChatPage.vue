@@ -494,6 +494,9 @@ $titleFontColor:#FFFFFF;
                         vertical-align: middle;
                         border-radius: 4px;
                         overflow: hidden;
+                        text-overflow: ellipsis;
+                        word-break: keep-all;
+                        white-space: nowrap;
                         box-sizing: border-box;
                     }
                 }
@@ -784,6 +787,12 @@ $titleFontColor:#FFFFFF;
                         height: 100%;
                         width: 100%;
                         object-fit: contain;
+                    }
+                    .userName{
+                            width: 100%;
+                            color: $mainTitleFontColor;
+                            font-size: 20px;
+                            font-weight: 700;
                     }
                 }
                 .userChatContent{
