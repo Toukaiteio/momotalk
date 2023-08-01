@@ -102,6 +102,7 @@ $generalBtnFontColor:#696D6F;
     height: 100%;
     width: 100%;
     min-width: 948px;
+    min-height: 500px;
     background-color: $generalBgColor;
     border-radius: 8px;
     filter: drop-shadow(0px 0px 6px lightgray);

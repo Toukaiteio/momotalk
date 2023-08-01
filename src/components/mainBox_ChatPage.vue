@@ -38,9 +38,9 @@
             </div>
         </div>
         <div class="_chatPage_ChatDetail_Wrapper">
-            <div class="chat_ContentContainer"  v-if="PageState.onSelectIndex!=-1 && PageState.onChatFlow.length>0">
+            <div class="chat_ContentContainer"  v-if="PageState.onSelectIndex!=-1 && (typeof PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()] != 'undefined') ">
                 <!-- target self nohead image statetext -->
-                <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
+                <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
                     <div class="userAvatar">
                         <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.studentList[parseInt(chatitem.slIndex)].Avatar[0]">
                     </div>
@@ -53,13 +53,17 @@
                     </div>
                     <div class="userImageContent" v-if="chatitem.type.indexOf('image')!=-1">
                         <div class="userName">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
-                        <img :src="chatitem.content">
+                        
+                        <div class="imageContainer">
+                            <img :src="chatitem.content">
+                        </div>
+                        
                     </div>
                 </div>
             </div>
         </div>
         <div class="ControlBar" v-show="PageState.isShowControlBar" v-if="PageState.onSelectIndex!=-1">
-            <div class="_general_btn" @click="()=>{PageState.isShowCreator=true;}">
+            <div class="_general_btn" @click="openCreator()">
                     为该角色创建对话
                 </div>
             <div class="_general_btn" @click="_PD.enableUnpullableStudent" v-if="!_PD.isShowUnpullable">
@@ -77,10 +81,10 @@
             </div>
         </div>
         <div class="ControlBar" v-show="!PageState.isShowControlBar" @click="showControlBar()"></div>
-        <div class="screenShotEl" :class="{notShot:!PageState.isScreenShotting,shot:PageState.isScreenShotting}" id="chatBox"  v-if="PageState.onSelectIndex!=-1 && PageState.onChatFlow.length>0">
+        <div class="screenShotEl" :class="{notShot:!PageState.isScreenShotting,shot:PageState.isScreenShotting}" id="chatBox"  v-if="PageState.onSelectIndex!=-1 && (typeof PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()] != 'undefined')">
                 <!-- target self nohead image statetext -->
                 <div class="ads">由momotalk模拟器生成,项目地址:https://github.com/Toukaiteio/my_momotalk</div>
-                <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
+                <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
                     <div class="userAvatar">
                         <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.studentList[parseInt(chatitem.slIndex)].Avatar[0]">
                     </div>
@@ -98,7 +102,7 @@
                 </div>
             </div>
     </div>
-    <div class="dialog_creator" v-show="PageState.isShowCreator">
+    <div class="dialog_creator" v-if="PageState.isShowCreator">
         <div class="window_wrapper">
             <div class="header">
                <div>STORY-CREATOR</div>
@@ -106,8 +110,8 @@
             </div>
             <div class="mainbox">
                 <div class="inputer_wrapper">
-                    <div class="inputer_block chat_detail" v-if="PageState.preChatFlow.length>0">
-                        <div class="obj_container" v-for="(_item,_index) in PageState.preChatFlow" :key="_index" :class="{selected:_index==PageState.preChatOnSelected}" @click="hardChangeSelect(_index)">
+                    <div class="inputer_block chat_detail" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]">
+                        <div class="obj_container" v-for="(_item,_index) in PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]" :key="_index" :class="{selected:_index==PageState.preChatOnSelected}" @click="hardChangeSelect(_index)">
                             <div class="bas_obj" :class="_item.type" v-if="_item.type.indexOf('image')==-1">{{_item.content}}</div> 
                             <div class="bas_obj" :class="_item.type" v-else>
                                 [图片:{{_item.content}}]
@@ -117,7 +121,7 @@
                             <div class="bas_obj self">#Self</div>    
                         </div> -->
                     </div>
-                    <div class="inputer_block chat_detail" v-if="PageState.preChatFlow.length<=0">
+                    <div class="inputer_block chat_detail" v-if="!PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]">
                         尝试点击 【新建】 来创建一段对话吧~
                     </div>
                     <div class="inputer_block fun_btns">
@@ -148,15 +152,15 @@
                         </div>
                     </div>
                     <div class="inputer_block config">
-                        <div class="inputer_item" v-if="PageState.preChatFlow.length>0">内容: <input type="text" v-model="PageState.preChatFlow[PageState.preChatOnSelected].content" /> </div>
-                        <div class="inputer_item" v-if="PageState.preChatFlow.length>0">类型: <input type="text" v-model="PageState.preChatFlow[PageState.preChatOnSelected].type"/> </div>
-                        <div class="inputer_item" v-if="PageState.preChatFlow.length>0">角色: <input type="text" v-model="PageState.preChatFlow[PageState.preChatOnSelected].slIndex"/> </div>
-                        <div class="inputer_item" v-if="PageState.preChatFlow.length>0">延迟: <input type="text" v-model="PageState.preChatFlow[PageState.preChatOnSelected].delay"/> </div>
+                        <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">内容: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content" /> </div>
+                        <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">类型: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type"/> </div>
+                        <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">角色: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex"/> </div>
+                        <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">延迟: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].delay"/> </div>
                     </div>
                 </div>
                 <div class="btns">
                     <div class="_general_btn">
-                        <div class="context" @click="()=>{PageState.onChatFlow=PageState.preChatFlow;PageState.isShowCreator=false;}">
+                        <div class="context" @click="confirmChat()">
                             确定
                         </div>
                     </div>
@@ -164,7 +168,7 @@
                         <div class="context">
                             重置
                         </div>
-                        </div>
+                    </div>
                     <div class="_general_btn" @click="()=>{PageState.isShowCreator=false;}">
                         <div class="context">
                             取消
@@ -206,17 +210,9 @@ import domToImage from 'dom-to-image';
 const PageState=reactive({
     onSelectIndex:-1,
     onSelectStudentData:{},
-    preChatFlow:[
-    {
-        "type":"statetext",
-        "content":"请在此处输入内容",
-        "sid":"-1",
-        "slIndex":"-1",
-        "delay":"normal"
-    }
-],
+    preChatFlow:{},
     preChatOnSelected:0,
-    onChatFlow:[],
+    onChatFlow:{},
     isShowControlBar:true,
     isShowCreator:false,
     identity:false,
@@ -226,14 +222,14 @@ const PageState=reactive({
     isScreenShotting:false,
 });
 const hardChangeSelect=(n)=>{
-    if(n>=0 && n<PageState.preChatFlow.length){
+    if(n>=0 && n<PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].length){
         PageState.preChatOnSelected=n;
     }
 }
 
 const changeSelected=(met)=>{
     if(met){
-        if(PageState.preChatOnSelected+1<PageState.preChatFlow.length){
+        if(PageState.preChatOnSelected+1<PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].length){
             PageState.preChatOnSelected+=1;
         }
     }else{
@@ -244,26 +240,26 @@ const changeSelected=(met)=>{
     
 }
 const copyOnSelecting=()=>{
-    const tempA=PageState.preChatFlow.slice(0,PageState.preChatOnSelected+1);
-    const tempB=PageState.preChatFlow.slice(PageState.preChatOnSelected+1);
-    PageState.preChatFlow=tempA.concat([{
-        "type":PageState.preChatFlow[PageState.preChatOnSelected].type,
-        "content":PageState.preChatFlow[PageState.preChatOnSelected].content,
-        "sid":PageState.preChatFlow[PageState.preChatOnSelected].sid,
-        "slIndex":PageState.preChatFlow[PageState.preChatOnSelected].slIndex,
-        "delay":PageState.preChatFlow[PageState.preChatOnSelected].delay,
+    const tempA=PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].slice(0,PageState.preChatOnSelected+1);
+    const tempB=PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].slice(PageState.preChatOnSelected+1);
+    PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=tempA.concat([{
+        "type":PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type,
+        "content":PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content,
+        "sid":PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].sid,
+        "slIndex":PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex,
+        "delay":PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].delay,
     },...tempB]);
     changeSelected(1);
 }
 const deleteOnSelecting=()=>{
-    const tempA=PageState.preChatFlow.slice(0,PageState.preChatOnSelected);
-    const tempB=PageState.preChatFlow.slice(PageState.preChatOnSelected+1);
-    PageState.preChatFlow=tempA.concat(tempB);
+    const tempA=PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].slice(0,PageState.preChatOnSelected);
+    const tempB=PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].slice(PageState.preChatOnSelected+1);
+    PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=tempA.concat(tempB);
 }
 const addOnSelecting=()=>{
-    const tempA=PageState.preChatFlow.slice(0,PageState.preChatOnSelected+1);
-    const tempB=PageState.preChatFlow.slice(PageState.preChatOnSelected+1);
-    PageState.preChatFlow=tempA.concat([{
+    const tempA=PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].slice(0,PageState.preChatOnSelected+1);
+    const tempB=PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].slice(PageState.preChatOnSelected+1);
+    PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=tempA.concat([{
         "type":"statetext",
         "content":"请在此处输入内容",
         "sid":"-1",
@@ -272,11 +268,12 @@ const addOnSelecting=()=>{
     },...tempB]);
     changeSelected(1);
 }
+
 const isNohead=(type,index)=>{
     if(index==0 || type.indexOf('self')!=-1 || type.indexOf('image')!=-1 || type.indexOf('statetext') != -1){
         return type;
     }else{
-        if(PageState.onChatFlow[index-1].type.indexOf('target')!=-1 && PageState.onChatFlow[index].slIndex==PageState.onChatFlow[index-1].slIndex && PageState.onChatFlow[index-1].type.indexOf('image')==-1){
+        if(PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()][index-1].type.indexOf('target')!=-1 && PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()][index].slIndex==PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()][index-1].slIndex && PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()][index-1].type.indexOf('image')==-1){
             return type+" nohead";
         }else{
             return type;
@@ -297,13 +294,18 @@ const exportToImage=()=>{
       })
 }
 const chatReset=()=>{
-    PageState.preChatFlow=[{
+    PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=[{
         "type":"statetext",
         "content":"请在此处输入内容",
         "sid":"-1",
         "slIndex":"-1",
         "delay":"normal"
     }]
+}
+const confirmChat=()=>{
+    PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]=PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()];
+    localStorage.setItem(PageState.onSelectStudentData.Id.toString(),JSON.stringify(PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]));
+    PageState.isShowCreator=false;
 }
 const _PD=PageData();
 //initail Student Data
@@ -321,7 +323,38 @@ for(let i of _PD.studentList){
 const changeSelection=(_i)=>{
     PageState.onSelectIndex=_i;
     PageState.onSelectStudentData=_PD.studentList[_i];
+    if(localStorage.getItem(PageState.onSelectStudentData.Id.toString())==null){
+        PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]=[{
+            "type":"statetext",
+            "content":"请在此处输入内容",
+            "sid":"-1",
+            "slIndex":"-1",
+            "delay":"normal"
+        }]
+        localStorage.setItem(PageState.onSelectStudentData.Id.toString(),JSON.stringify(PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]))
+    }else{
+        try{
+            PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]=JSON.parse(localStorage.getItem(PageState.onSelectStudentData.Id.toString()))
+        }catch(e){
+            PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]=[{
+                "type":"statetext",
+                "content":"请在此处输入内容",
+                "sid":"-1",
+                "slIndex":"-1",
+                "delay":"normal"
+            }]
+        localStorage.setItem(PageState.onSelectStudentData.Id.toString(),JSON.stringify(PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]))
+
+        }
+    }
+    
     // console.log(PageState.onSelectIndex);
+}
+const openCreator=()=>{
+    if(!PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]){
+        PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()];
+    }
+    PageState.isShowCreator=true;
 }
 const hideControlBar=()=>{
     PageState.isShowControlBar=false;
@@ -778,15 +811,25 @@ $titleFontColor:#FFFFFF;
                     }
                 }
                 .userImageContent{
+                    margin-left: 8px;
                     display: none;
-                    height: 280px;
-                    width: 280px;
-                    padding: 6px;
-                    box-sizing: border-box;
-                    img{
-                        height: 100%;
-                        width: 100%;
-                        object-fit: contain;
+                    .imageContainer{
+                        height: 280px;
+                        width: 280px;
+                        padding: 12px;
+                        box-sizing: border-box;
+                        border-radius: 12px;
+                        border: 1px solid lightgray;
+                        background-color: #FEFEFE;
+                        overflow: hidden;
+                        img{
+                            height: 100%;
+                            width: 100%;
+                            object-fit: contain;
+                            border: 1px solid rgb(240, 240, 240);
+                            border-radius: 8px;
+                            overflow: hidden;
+                        }
                     }
                     .userName{
                             width: 100%;
