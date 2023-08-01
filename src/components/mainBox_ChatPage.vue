@@ -102,6 +102,9 @@
                 </div>
             </div>
     </div>
+    <div class="screenShotCover" v-if="PageState.isScreenShotting">
+        图片生成中~
+    </div>
     <div class="dialog_creator" v-if="PageState.isShowCreator">
         <div class="window_wrapper">
             <div class="header">
@@ -280,7 +283,16 @@ const isNohead=(type,index)=>{
         }
     }
 }
+const isAllowScreenShot=()=>{
+    for(let i of PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]){
+        if(i.type.indexOf('image')!=-1){
+            return false;
+        }
+    }
+    return true;
+}
 const exportToImage=()=>{
+    if(isAllowScreenShot()){
     PageState.isScreenShotting=true;
     domToImage.toPng(document.getElementById('chatBox'))
       .then(function(dataUrl){
@@ -291,7 +303,22 @@ const exportToImage=()=>{
         document.body.appendChild(fileLink);
         fileLink.click();
         PageState.isScreenShotting=false;
-      })
+      })}else{
+        PageState.isScreenShotting=true;
+        domToImage.toPng(document.getElementById('chatBox'))
+        .then(function(dataUrl){
+            const fileLink = document.createElement('a');
+            fileLink.href = dataUrl;
+            const nowtime=new Date();
+            fileLink.setAttribute('download',"导出的图片-momotalk-github_Toukaiteio-ts_"+nowtime.getTime()+".png");
+            document.body.appendChild(fileLink);
+            fileLink.click();
+            PageState.isScreenShotting=false;
+        }).catch(function(){
+            PageState.isScreenShotting=false;
+            alert("创建图像失败，您有以下解决方案：\r\n1、请允许浏览器跨域(ALLOW CORS)\r\n2、使资源地址允许跨域访问\r\n3、删除图像消息");
+        })
+      }
 }
 const chatReset=()=>{
     PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=[{
@@ -384,6 +411,20 @@ $chatFontColor:#F4F5F6;
 $creatorCoverBgColor:#f3f7f836;
 $windowBarBgColor:#FC8DA2;
 $titleFontColor:#FFFFFF;
+.screenShotCover{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    background-color: $creatorCoverBgColor;
+    backdrop-filter: blur(3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    color: $mainTitleFontColor;
+}
 .dialog_creator{
     position: absolute;
     height: 100%;
@@ -876,7 +917,7 @@ $titleFontColor:#FFFFFF;
                 }
             }
             .chat_BaseObject.nohead{
-                margin-top: 12px !important;
+                margin-top: 6px !important;
                 .userAvatar{
                     opacity: 0;
                 }
@@ -1015,7 +1056,9 @@ $titleFontColor:#FFFFFF;
         left: -5000px;
     }
     .screenShotEl.shot{
-        position: relative;
+        position: absolute;
+        top: 0px;
+        left: 0px;
     }
     .screenShotEl{
         
