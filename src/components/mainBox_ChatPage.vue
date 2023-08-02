@@ -55,7 +55,7 @@
                         <div class="userName">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
                         
                         <div class="imageContainer">
-                            <img :src="chatitem.content">
+                            <img :src="getImageContent(chatitem.content)">
                         </div>
                         
                     </div>
@@ -162,6 +162,7 @@
                         <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">类型: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type"/> </div>
                         <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">角色: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex"/> </div>
                         <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">延迟: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].delay"/> </div>
+                        <input type="file" class="image_inputer" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('image')!=-1" @change="image_dragin"/>
                     </div>
                 </div>
                 <div class="btns">
@@ -268,8 +269,8 @@ const addOnSelecting=()=>{
     PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=tempA.concat([{
         "type":"statetext",
         "content":"请在此处输入内容",
-        "sid":"-1",
-        "slIndex":"-1",
+        "sid":PageState.onSelectStudentData.Id.toString(),
+        "slIndex":PageState.onSelectIndex.toString(),
         "delay":"normal"
     },...tempB]);
     changeSelected(1);
@@ -286,19 +287,19 @@ const isNohead=(type,index)=>{
         }
     }
 }
-const isAllowScreenShot=()=>{
-    for(let i of PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]){
-        if(i.type.indexOf('image')!=-1){
-            return false;
-        }
-    }
-    return true;
-}
+// const isAllowScreenShot=()=>{
+//     // for(let i of PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]){
+//     //     if(i.type.indexOf('image')!=-1){
+//     //         return false;
+//     //     }
+//     // }
+//     // return true;
+//     return false;
+// }
 const exportToImage=()=>{
-    if(isAllowScreenShot()){
     PageState.isScreenShotting=true;
     domToImage.toPng(document.getElementById('chatBox'))
-      .then(function(dataUrl){
+    .then(function(dataUrl){
         const fileLink = document.createElement('a');
         fileLink.href = dataUrl;
         const nowtime=new Date();
@@ -306,50 +307,26 @@ const exportToImage=()=>{
         document.body.appendChild(fileLink);
         fileLink.click();
         PageState.isScreenShotting=false;
-      })}else{
-        PageState.isScreenShotting=true;
-        domToImage.toPng(document.getElementById('chatBox'))
-        .then(function(dataUrl){
-            const fileLink = document.createElement('a');
-            fileLink.href = dataUrl;
-            const nowtime=new Date();
-            fileLink.setAttribute('download',"导出的图片-momotalk-github_Toukaiteio-ts_"+nowtime.getTime()+".png");
-            document.body.appendChild(fileLink);
-            fileLink.click();
-            PageState.isScreenShotting=false;
-        }).catch(function(){
-            PageState.isScreenShotting=false;
-            alert("创建图像失败，您有以下解决方案：\r\n1、请允许浏览器跨域(ALLOW CORS)\r\n2、使资源地址允许跨域访问\r\n3、删除图像消息");
-        })
-      }
+    }).catch(function(){
+        PageState.isScreenShotting=false;
+        alert("创建图像失败，您有以下解决方案：\r\n1、请允许浏览器跨域(ALLOW CORS)\r\n2、使资源地址允许跨域访问\r\n3、删除图像消息");
+    })
 }
 const chatReset=()=>{
     PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=[{
         "type":"statetext",
         "content":"请在此处输入内容",
-        "sid":"-1",
-        "slIndex":"-1",
+        "sid":PageState.onSelectStudentData.Id.toString(),
+        "slIndex":PageState.onSelectIndex.toString(),
         "delay":"normal"
     }]
 }
 const confirmChat=()=>{
-    PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]=PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()];
+    PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]=[...PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]];
     localStorage.setItem(PageState.onSelectStudentData.Id.toString(),JSON.stringify(PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]));
     PageState.isShowCreator=false;
 }
 const _PD=PageData();
-//initail Student Data
-for(let i of _PD.studentList){
-    if(localStorage.getItem(`${i.Id}_unread`)==null){
-        localStorage.setItem(`${i.Id}_unread`,JSON.stringify([]));
-    }
-    PageState.unreadMessageNumberList.push(JSON.parse(localStorage.getItem(`${i.Id}_unread`)));
-    if(localStorage.getItem(`${i.Id}_message`)==null){
-        localStorage.setItem(`${i.Id}_message`,JSON.stringify([]));
-    }
-    PageState.unreadMessageNumberList.push(JSON.parse(localStorage.getItem(`${i.Id}_message`)));
-}
-//init end
 const changeSelection=(_i)=>{
     PageState.onSelectIndex=_i;
     PageState.onSelectStudentData=_PD.studentList[_i];
@@ -357,8 +334,8 @@ const changeSelection=(_i)=>{
         PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]=[{
             "type":"statetext",
             "content":"请在此处输入内容",
-            "sid":"-1",
-            "slIndex":"-1",
+            "sid":PageState.onSelectStudentData.Id.toString(),
+            "slIndex":PageState.onSelectIndex.toString(),
             "delay":"normal"
         }]
         localStorage.setItem(PageState.onSelectStudentData.Id.toString(),JSON.stringify(PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]))
@@ -369,8 +346,8 @@ const changeSelection=(_i)=>{
             PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]=[{
                 "type":"statetext",
                 "content":"请在此处输入内容",
-                "sid":"-1",
-                "slIndex":"-1",
+                "sid":PageState.onSelectStudentData.Id.toString(),
+                "slIndex":PageState.onSelectIndex.toString(),
                 "delay":"normal"
             }]
         localStorage.setItem(PageState.onSelectStudentData.Id.toString(),JSON.stringify(PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]))
@@ -382,7 +359,7 @@ const changeSelection=(_i)=>{
 }
 const openCreator=()=>{
     if(!PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]){
-        PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()];
+        PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]=[...PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]];
     }
     PageState.isShowCreator=true;
 }
@@ -396,6 +373,55 @@ const showControlBar=()=>{
         PageState.mouseClickTimes=0;
     }else{
         setTimeout(()=>{PageState.mouseClickTimes=0},700);
+    }
+}
+const getImageContent=(ori)=>{
+    if(ori[0]=="#"){
+        return localStorage.getItem(ori.replace("#",""));
+    }else{
+        return ori;
+    }
+}
+const save_to_data_bucket=(size,content)=>{
+    if(content.length<=5000000){
+        const _type=content.split(";")[0].split(":")[1];
+        const _bucket_id=size.toString()+"_"+_type;
+        const _ck=localStorage.getItem(_bucket_id);
+        if(_ck==null){
+            localStorage.setItem(_bucket_id,content);
+            PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}`
+        }else{
+            if(_ck!=content){
+                let _counter=1;
+                while(localStorage.getItem(_bucket_id+`_${_counter}`)!=null){
+                    const _ck_sub=localStorage.getItem(_bucket_id+`_${_counter}`);
+                    if(_ck_sub==content){
+                        PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}_${_counter}`
+                        _counter=-2;
+                        break;
+                    }
+                    _counter+=1;
+                }
+                if(_counter>0){
+                    localStorage.setItem(_bucket_id+`_${_counter}`,content);
+                    PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}_${_counter}`
+                }
+            }else{
+                PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}`
+            }
+        }
+    }else{
+        alert("图片过大!请尝试压缩图片或降低图片分辨率! :(")
+    }
+}
+const image_dragin=(e)=>{
+    // console.log(e);
+    const _file=e.target.files[0];
+    const _tFR=new FileReader();
+    _tFR.readAsDataURL(_file);
+    _tFR.onload=(E)=>{
+        save_to_data_bucket(E.total,E.target.result);
+        // PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].content=
     }
 }
 </script>
@@ -519,6 +545,8 @@ $titleFontColor:#FFFFFF;
                 .config{
                     padding: 8px;
                     box-sizing: border-box;
+                    display: flex;
+                    flex-direction: column;
                     .inputer_item{
                         height: 22px;
                         width: 100%;
@@ -529,6 +557,26 @@ $titleFontColor:#FFFFFF;
                             height: 100%;
                         }
                         margin-bottom: 6px;
+                    }
+                    .image_inputer{
+                        flex: 1;
+                        width: 100%;
+                        height: 0;
+                        border: 3px dashed gray;
+                        
+                        position: relative;
+                    }
+                    .image_inputer::after{
+                        position: absolute;
+                        top: 0px;
+                        left: 0px;
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 22px;
+                        content: "也可拖拽至此上传~";
                     }
                 }
                 
