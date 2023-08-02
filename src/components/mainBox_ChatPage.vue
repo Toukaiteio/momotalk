@@ -922,13 +922,14 @@ $titleFontColor:#FFFFFF;
             .chat_BaseObject.nohead{
                 margin-top: 6px !important;
                 .userAvatar{
-                    opacity: 0;
+                display: none;
+            }
+            .userChatContent{
+                margin-left: 65px;
+                .userName{
+                    display: none;
                 }
-                .userChatContent{
-                    .userName{
-                        display: none;
-                    }
-                }
+            }
                 .decoration_triangle{
                     opacity: 0;
                 }
@@ -1161,9 +1162,10 @@ $titleFontColor:#FFFFFF;
         .chat_BaseObject.nohead{
             margin-top: 12px !important;
             .userAvatar{
-                opacity: 0;
+                display: none;
             }
             .userChatContent{
+                margin-left: 65px;
                 .userName{
                     display: none;
                 }
