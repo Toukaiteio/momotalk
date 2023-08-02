@@ -97,7 +97,10 @@
                     </div>
                     <div class="userImageContent" v-if="chatitem.type.indexOf('image')!=-1">
                         <div class="userName">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
-                        <img :src="chatitem.content">
+                        <div class="imageContainer">
+                            <img :src="chatitem.content">
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -1090,17 +1093,33 @@ $titleFontColor:#FFFFFF;
                 }
             }
             .userImageContent{
-                display: none;
-                height: 280px;
-                width: 280px;
-                padding: 6px;
-                box-sizing: border-box;
-                img{
-                    height: 100%;
-                    width: 100%;
-                    object-fit: contain;
+                    margin-left: 8px;
+                    display: none;
+                    .imageContainer{
+                        height: 280px;
+                        width: 280px;
+                        padding: 12px;
+                        box-sizing: border-box;
+                        border-radius: 12px;
+                        border: 1px solid lightgray;
+                        background-color: #FEFEFE;
+                        overflow: hidden;
+                        img{
+                            height: 100%;
+                            width: 100%;
+                            object-fit: contain;
+                            border: 1px solid rgb(240, 240, 240);
+                            border-radius: 8px;
+                            overflow: hidden;
+                        }
+                    }
+                    .userName{
+                            width: 100%;
+                            color: $mainTitleFontColor;
+                            font-size: 20px;
+                            font-weight: 700;
+                    }
                 }
-            }
             .userChatContent{
 
                 flex: 1;
