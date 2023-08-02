@@ -1012,6 +1012,33 @@ $titleFontColor:#FFFFFF;
                     display: initial;
                 }
             }
+            .chat_BaseObject.image.cover{
+                .userImageContent{
+                    .imageContainer{
+                        img{
+                            object-fit: cover;
+                        }
+                    }
+                }
+            }
+            .chat_BaseObject.image.fit{
+                .userImageContent{
+                    .imageContainer{
+                        img{
+                            object-fit:contain;
+                        }
+                    }
+                }
+            }
+            .chat_BaseObject.image.fill{
+                .userImageContent{
+                    .imageContainer{
+                        img{
+                            object-fit: fill;
+                        }
+                    }
+                }
+            }
             .chat_BaseObject.target{
                 .userChatContent{
                     
@@ -1252,6 +1279,33 @@ $titleFontColor:#FFFFFF;
                 display: initial;
             }
         }
+        .chat_BaseObject.image.cover{
+                .userImageContent{
+                    .imageContainer{
+                        img{
+                            object-fit: cover;
+                        }
+                    }
+                }
+            }
+            .chat_BaseObject.image.fit{
+                .userImageContent{
+                    .imageContainer{
+                        img{
+                            object-fit:contain;
+                        }
+                    }
+                }
+            }
+            .chat_BaseObject.image.fill{
+                .userImageContent{
+                    .imageContainer{
+                        img{
+                            object-fit: fill;
+                        }
+                    }
+                }
+            }
         .chat_BaseObject.target{
             .userChatContent{
                 
