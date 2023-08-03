@@ -98,7 +98,7 @@
                     <div class="userImageContent" v-if="chatitem.type.indexOf('image')!=-1">
                         <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
                         <div class="imageContainer">
-                            <img :src="chatitem.content">
+                            <img :src="getImageContent(chatitem.content)">
                         </div>
                         
                     </div>
