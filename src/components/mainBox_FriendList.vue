@@ -28,7 +28,7 @@
             <div class="Main_body">
                 <div class="list_wrapper">
                     <div class="list_item" v-for="(item,index) in _PD.studentList" :key="index" :class="{selected:(index==PageState.onSelectIndex)}" @click="changeSelection(index)">
-                        <div class="user_avatar"><img :src="item.Avatar[0]" /></div>
+                        <div class="user_avatar"><img :src="_PD.avatarList[item.Id]"/></div>
                         <div class="user_detail">
                             <div class="user_name">{{item.Name}}</div>
                             <div class="user_intro">{{item.Bio}}</div>
@@ -43,7 +43,7 @@
             <div class="detail_container" v-if="PageState.onSelectIndex!=-1">
                 <div class="detail_UserAvatar">
                     <div class="avatar_container">
-                        <img :src="PageState.onSelectStudentData.Avatar[0]">
+                        <img :src="_PD.avatarList[PageState.onSelectStudentData.Id]">
                         <div class="user_relation_lvl"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/></svg><div class="font_front">12</div><div class="font_back">12</div></div>
                     </div>
                     
@@ -84,7 +84,7 @@ const changeSelection=(_i)=>{
     // console.log(PageState.onSelectIndex);
 }
 // alert(_PD.studentList);
-// console.log(_PD.studentList);
+// console.log(avatarLoader("https://static.wikia.nocookie.net/blue-archive/images/d/de/Hoshino_Icon.png"));
 </script>
 <style lang="scss" scoped>
 $mainBoxBgColorLeft:#F3F7F8;

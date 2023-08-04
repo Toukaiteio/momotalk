@@ -5,6 +5,7 @@ export const PageData = defineStore('main', {
   state:()=>{
     return {
         studentList:student_half,
+        avatarList:{},
         isShowUnpullable:false
     }
   },
@@ -18,6 +19,9 @@ export const PageData = defineStore('main', {
         this.isShowUnpullable=false;
         localStorage.setItem("isup",0);
         this.studentList=student_half;
+    },
+    addToAvatarList(id,data){
+      this.avatarList[id]=data;
     }
   }
 })

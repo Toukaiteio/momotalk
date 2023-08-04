@@ -28,7 +28,7 @@
             <div class="Main_body">
                 <div class="list_wrapper">
                     <div class="list_item" v-for="(item,index) in _PD.studentList" :key="index" :class="{selected:(index==PageState.onSelectIndex)}" @click="changeSelection(index)">
-                        <div class="user_avatar"><img :src="item.Avatar[0]" /></div>
+                        <div class="user_avatar"><img :src="_PD.avatarList[item.Id]" /></div>
                         <div class="user_detail">
                             <div class="user_name">{{item.Name}}</div>
                             <div class="user_lastchat">角色ID:{{index}}</div>
@@ -42,7 +42,7 @@
                 <!-- target self nohead image statetext -->
                 <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
                     <div v-if="chatitem.type.indexOf('self')==-1" class="userAvatar">
-                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.studentList[parseInt(chatitem.slIndex)].Avatar[0]">
+                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.avatarList[PageState.onSelectStudentData.Id]">
                     </div>
                     <div class="userChatContent" v-if="chatitem.type.indexOf('image')==-1">
                         <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
@@ -86,7 +86,7 @@
                 <div class="ads">由momotalk模拟器生成,项目地址:https://github.com/Toukaiteio/my_momotalk</div>
                 <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
                     <div class="userAvatar" v-if="chatitem.type.indexOf('self')==-1">
-                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.studentList[parseInt(chatitem.slIndex)].Avatar[0]">
+                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.avatarList[PageState.onSelectStudentData.Id]">
                     </div>
                     <div class="userChatContent" v-if="chatitem.type.indexOf('image')==-1">
                         <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>

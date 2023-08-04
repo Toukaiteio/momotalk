@@ -76,6 +76,52 @@
     }
     console.log(PageStateObj.isDefaultPage)
   }
+  const imageLoader=(url)=>{return new Promise((resolve, reject)=>{
+    const _oriDataArray=url.split("/");
+    const tnA=_oriDataArray[_oriDataArray.length-1].split(".")
+    let _t=tnA[1];
+    if(_t=="jpg"){
+        _t="jpeg";
+    }
+    const _n=tnA[0];
+    const _item=localStorage.getItem(_n);
+    if(_item==null){
+    let canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      let img = new Image()
+      img.crossOrigin = 'Anonymous'
+      img.src = url
+      img.onload = function() {
+        canvas.height = img.height / 2;
+        canvas.width = img.width / 2;
+        ctx.drawImage(img, 0, 0, img.width / 2, img.height / 2)
+        const dataURL = canvas.toDataURL(`image/${_t}`, 1)
+        localStorage.setItem(_n,dataURL);
+        resolve(dataURL)
+        canvas = null
+        img = null
+      }
+      img.onerror = function() {
+            reject(url);
+        }
+    }else{
+        resolve(_item)
+    }
+})}
+async function avatarLoader(url,id){
+    await imageLoader(url).then(value=>{
+        // console.log(value);
+        // avatarList[id]=value
+        _PD.addToAvatarList(id,value);
+    }).catch(error=>{
+        // console.log(error);
+        _PD.addToAvatarList(id,error);
+    })
+    return "looped";
+}
+for(let __s__ of _PD.studentList){
+  avatarLoader(__s__.Avatar[0],__s__.Id);
+}
 </script>
 <style lang="scss">
 $windowBarBgColor:#FC8DA2;
