@@ -119,8 +119,34 @@ async function avatarLoader(url,id){
     })
     return "looped";
 }
-for(let __s__ of _PD.studentList){
-  avatarLoader(__s__.Avatar[0],__s__.Id);
+{
+  const _t_cC=localStorage.getItem("createdChara");
+  if(_t_cC!=null){
+    for(let __i__ of JSON.parse(_t_cC)){
+      const _t_sObj=JSON.parse(localStorage.getItem(__i__));
+      if(typeof _t_sObj["custom"] != "undefined"){
+        _PD.pushCustomStudent(_t_sObj);
+      }
+
+    }
+  }
+
+  let _t_counter=0;
+  for(let __s__ of _PD.studentList){
+    const _t_sc=localStorage.getItem(`${__s__.Id}_custom`);
+    if(_t_sc!=null){
+      const _t_d=JSON.parse(_t_sc);
+      // if(typeof _t_d["custom"] != 'undefined'){
+      _PD.addToAvatarList(_t_d.Id,_t_d["Avatar"][0]);
+      // }else{
+      // avatarLoader(_t_d.Avatar[0],_t_d.Id);
+      // }
+      _PD.changeBaseCustomedStudent(_t_d,_t_counter,1);
+    }else{
+      avatarLoader(__s__.Avatar[0],__s__.Id);
+    }
+    _t_counter+=1;
+  }
 }
 </script>
 <style lang="scss">
