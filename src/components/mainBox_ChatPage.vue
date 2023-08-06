@@ -4,13 +4,27 @@
             <div class="Main_header">
                 <div class="item_left">未读消息(0)</div>
                 <div class="item_right">
-                    <div class="_general_btn">
+                    <div class="_general_btn" @click="_PD.enableUnpullableStudent" v-if="!_PD.isShowUnpullable">
+                        <div class="unread">
+                            <div class="context">    
+                            开启未实装角色
+                            </div>
+                        </div>
+                    </div>
+                    <div class="_general_btn" @click="_PD.disableUnpullableStudent" v-else>
+                        <div class="unread">
+                            <div class="context">    
+                                关闭未实装角色
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="_general_btn">
                         <div class="unread">
                             <div class="context">
                                 未读
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="_general_btn">
                         <div class="list_wrapper">
                             <div class="list_display">
@@ -64,16 +78,16 @@
         </div>
         <div class="ControlBar" v-show="PageState.isShowControlBar" v-if="PageState.onSelectIndex!=-1">
             <div class="_general_btn" @click="openCreator()">
-                    为该角色创建对话
-                </div>
-            <div class="_general_btn" @click="_PD.enableUnpullableStudent" v-if="!_PD.isShowUnpullable">
-                    开启未实装角色
+                为该角色创建对话
             </div>
-            <div class="_general_btn" @click="_PD.disableUnpullableStudent" v-else>
-                    关闭未实装角色
+            <!-- <div class="_general_btn" @click="()=>{PageState.isShowCharaCreator=true;PageState.cachedStudentAvatar='';PageState.cachedStudentName='';}">
+                创建自定义角色
+            </div> -->
+            <div class="_general_btn">
+                仍在开发中的功能
             </div>
             <div class="_general_btn" @click="exportToImage()">
-                    导出图片
+                导出图片
             </div>
             <div class="_general_btn" @click="hideControlBar()">
                 隐藏控制栏    
@@ -169,7 +183,7 @@
                              <input class="shorter" type="text" :disabled="(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')!=-1)" v-model="PageState.cachedStudentName"/>
                             <div class="_general_btn" @click="changeStudentName(_PD.studentList[PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex],PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex)"><div class="context">保存</div></div> </div>
                         <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">
-                            头像:(更新需刷新页面)
+                            头像:
                             <div v-if="!PageState.isAvatarChanging&&(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')==-1 && PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex > -1)" @click="PageState.isAvatarChanging=true;PageState.isNameChanging=false;PageState.isAvatarReady=false;" class="_general_btn"><div class="context">修改</div></div>
                             <div v-if="PageState.isAvatarReady&&(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')==-1 && PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex > -1)" class="_general_btn" @click="changeStudentAvatar(_PD.studentList[PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex],PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex)"><div class="context">保存</div></div>
                         </div>
@@ -189,7 +203,7 @@
                             重置
                         </div>
                     </div>
-                    <div class="_general_btn" @click="()=>{PageState.isShowCreator=false;PageState.isNameChanging=false;PageState.isAvatarChanging=false;PageState.isAvatarReady=false;}">
+                    <div class="_general_btn" @click="()=>{PageState.isShowCreator=false;PageState.isNameChanging=false;PageState.isAvatarChanging=false;PageState.isAvatarReady=false;PageState.cachedStudentAvatar='';}">
                         <div class="context">
                             取消
                         </div>
@@ -221,7 +235,49 @@
         </div>
         
     </div>
-
+    <div class="dialog_creator" v-if="PageState.isShowCharaCreator">
+        <div class="window_wrapper">
+            <div class="header">
+               <div>CHARA-CREATOR</div>
+               <div class="close" @click="()=>{PageState.isShowCharaCreator=false;PageState.cachedStudentAvatar='';PageState.cachedStudentName='';}"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></div>
+            </div>
+            <div class="mainbox">
+                <div class="chara_inputer_block config">
+                    <div class="preview_block">
+                        头像: <div class="avatar"><img src=""></div>
+                    </div>
+                    <div class="preview_block">
+                        <div class="inputer_item">姓名:
+                            <input type="text" v-model="PageState.cachedStudentName" />
+                        </div>
+                    </div>
+                    <div class="preview_block">
+                        <div class="inputer_item">简介:
+                            <input type="text" v-model="PageState.cachedStudentIntro" />
+                        </div>
+                    </div>
+                    <div class="preview_block">
+                        <div class="inputer_item">识别:
+                            <input type="text" v-model="PageState.cachedStudentId" />
+                        </div>
+                    </div>
+                </div>
+                <div class="chara_inputer_block">TEST</div>
+            </div>
+            <div class="btns">
+                    <div class="_general_btn">
+                        <div class="context">
+                            确定
+                        </div>
+                    </div>
+                    <div class="_general_btn" @click="()=>{PageState.isShowCharaCreator=false;PageState.cachedStudentAvatar='';}">
+                        <div class="context">
+                            取消
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
 </template>
 <script setup>
 import { PageData } from '../store';
@@ -235,6 +291,7 @@ const PageState=reactive({
     onChatFlow:{},
     isShowControlBar:true,
     isShowCreator:false,
+    isShowCharaCreator:false,
     identity:false,
     mouseClickTimes:0,
     inputDialogData:'',
@@ -244,7 +301,9 @@ const PageState=reactive({
     isAvatarChanging:false,
     isAvatarReady:false,
     cachedStudentName:"",
-    cachedStudentAvatar:""
+    cachedStudentAvatar:"",
+    cachedStudentIntro:"",
+    cachedStudentId:"",
 });
 const hardChangeSelect=(n)=>{
     if(n>=0 && n<PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].length){
@@ -341,6 +400,7 @@ const chatReset=()=>{
     PageState.isNameChanging=false;
     PageState.isAvatarChanging=false;
     PageState.isAvatarReady=false;
+    PageState.cachedStudentAvatar='';
 }
 const confirmChat=()=>{
     PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]=[...PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()]];
@@ -349,6 +409,7 @@ const confirmChat=()=>{
     PageState.isNameChanging=false;
     PageState.isAvatarChanging=false;
     PageState.isAvatarReady=false;
+    PageState.cachedStudentAvatar='';
 }
 const _PD=PageData();
 const changeSelection=(_i)=>{
@@ -389,6 +450,7 @@ const openCreator=()=>{
     PageState.isNameChanging=false;
     PageState.isAvatarChanging=false;
     PageState.isAvatarReady=false;
+    PageState.cachedStudentAvatar='';
 }
 const hideControlBar=()=>{
     PageState.isShowControlBar=false;
@@ -588,6 +650,26 @@ $titleFontColor:#FFFFFF;
                 height: 85%;
                 display: flex;
                 justify-content: space-between;
+                .chara_inputer_block{
+                    width: 50%;
+                    height: 100%;
+                    border: 1px solid black;
+                    display: flex;
+                    align-items: center;
+                    .preview_block{
+                        height: 50px;
+                        width: 100%;
+                        .avatar{
+                            height: 100%;
+                            aspect-ratio: 1 / 1;
+                            img{
+                                height: 100%;
+                                width: 100%;
+                                object-fit: cover;
+                            }
+                        }
+                    }
+                }
                 .inputer_block{
                     width: 33%;
                     height: 100%;

@@ -29,6 +29,7 @@ export const PageData = defineStore('main', {
     changeBaseCustomedStudent(_sObj,lid,from=0){
       this.studentList[lid]["Name"]=_sObj["Name"];
       this.studentList[lid]["Avatar"][0]=_sObj["Avatar"][0];
+      this.avatarList[lid]=_sObj["Avatar"][0];
       if(!from){
         localStorage.setItem(`${_sObj['Id']}_custom`,JSON.stringify(_sObj));
         const _t_cC=localStorage.getItem("createdChara");
