@@ -148,31 +148,38 @@ const _c_sID=setInterval(()=>{if(_PD.isDBReady){
   const _t_cC=localStorage.getItem("createdChara");
   if(_t_cC!=null){
     for(let __i__ of JSON.parse(_t_cC)){
-      const _t_sObj=JSON.parse(localStorage.getItem(`${__i__}_custom`));
-      if(typeof _t_sObj["custom"] != "undefined"){
-        _PD.pushCustomStudent(_t_sObj);
-      }
+      _PD.DBStorage_getItem(`${__i__}_custom`,(_v)=>{
+        const _t_sObj=JSON.parse(_v.imageData);
+        if(typeof _t_sObj["custom"] != "undefined"){
+          _PD.pushCustomStudent(_t_sObj);
+        }
+      })
+      
+      
     }
   }
 
   for(let __s__ in _PD.studentList){
-    const _t_sc=localStorage.getItem(`${_PD.studentList[__s__].Id}_custom`);
-    if(_t_sc!=null){
-      const _t_d=JSON.parse(_t_sc);
-      // if(typeof _t_d["custom"] != 'undefined'){
-      _PD.addToAvatarList(_t_d.Id,_t_d["Avatar"][0]);
-      // }else{
-      // avatarLoader(_t_d.Avatar[0],_t_d.Id);
-      // }
-      _PD.changeBaseCustomedStudent(_t_d,_t_d['Id'],1);
-    }else{
-      avatarLoader(_PD.studentList[__s__].Avatar[0],_PD.studentList[__s__].Id);
-    }
+    _PD.DBStorage_getItem(`${_PD.studentList[__s__].Id}_custom`,(_v)=>{
+      if(_v!=undefined){
+        const _t_sc=_v.imageData;
+          const _t_d=JSON.parse(_t_sc);
+          // if(typeof _t_d["custom"] != 'undefined'){
+          _PD.addToAvatarList(_t_d.Id,_t_d["Avatar"][0]);
+          // }else{
+          // avatarLoader(_t_d.Avatar[0],_t_d.Id);
+          // }
+          _PD.changeBaseCustomedStudent(_t_d,_t_d['Id'],1);
+      }else{
+        avatarLoader(_PD.studentList[__s__].Avatar[0],_PD.studentList[__s__].Id);
+      }
+  })
+    
   }
   clearInterval(_c_sID);
   console.log("INIT DONE!");
 }}
-,200)
+,100)
 
 </script>
 <style lang="scss">

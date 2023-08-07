@@ -272,8 +272,7 @@
                     <input type="file" class="image_inputer avatar" @change="image_dragin_createAvatar"/>
                 </div>
                 </div>
-            </div>
-            <div class="btns">
+                <div class="btns">
                     <div class="_general_btn">
                         <div class="context" @click="confirm_create_chara">
                             确定
@@ -285,6 +284,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            
         </div>
     </div>
 </template>
@@ -627,7 +628,8 @@ const confirm_create_chara=()=>{
             }
         }
         localStorage.setItem("createdChara",JSON.stringify([..._t_cC,_t_mI]));
-        localStorage.setItem(`${PageState.cachedStudentId}_custom`,JSON.stringify(_t_sD));
+        _PD.DBStorage_setItem(`${PageState.cachedStudentId}_custom`,JSON.stringify(_t_sD));
+        // localStorage.setItem(`${PageState.cachedStudentId}_custom`,);
         _PD.pushCustomStudent(_t_sD);
         _PD.addToAvatarList(PageState.cachedStudentId,PageState.cachedStudentAvatar);
         PageState.isShowCharaCreator=false;

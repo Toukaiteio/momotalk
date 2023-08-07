@@ -89,7 +89,8 @@ export const PageData = defineStore('main', {
       this.studentList[lid]["Avatar"][0]=_sObj["Avatar"][0];
       this.avatarList[lid]=_sObj["Avatar"][0];
       if(!from){
-        localStorage.setItem(`${_sObj['Id']}_custom`,JSON.stringify(_sObj));
+        this.DBStorage_setItem(`${_sObj['Id']}_custom`,JSON.stringify(_sObj))
+        // localStorage.setItem(`${_sObj['Id']}_custom`,JSON.stringify(_sObj));
         // const _t_cC=localStorage.getItem("createdChara");
         // if(_t_cC==null){
         //   localStorage.setItem("createdChara",JSON.stringify([_sObj['Id']]));
