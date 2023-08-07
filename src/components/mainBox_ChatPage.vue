@@ -4,7 +4,7 @@
             <div class="Main_header">
                 <div class="item_left">未读消息(0)</div>
                 <div class="item_right">
-                    <div class="_general_btn" @click="_PD.enableUnpullableStudent" v-if="!_PD.isShowUnpullable">
+                    <!-- <div class="_general_btn" @click="_PD.enableUnpullableStudent" v-if="!_PD.isShowUnpullable">
                         <div class="unread">
                             <div class="context">    
                             开启未实装角色
@@ -17,14 +17,14 @@
                                 关闭未实装角色
                             </div>
                         </div>
-                    </div>
-                    <!-- <div class="_general_btn">
+                    </div> -->
+                    <div class="_general_btn">
                         <div class="unread">
                             <div class="context">
                                 未读
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                     <div class="_general_btn">
                         <div class="list_wrapper">
                             <div class="list_display">
@@ -45,7 +45,7 @@
                         <div class="user_avatar"><img :src="_PD.avatarList[item.Id]" /></div>
                         <div class="user_detail">
                             <div class="user_name">{{item.Name}}</div>
-                            <div class="user_lastchat">角色ID:{{index}}</div>
+                            <div class="user_lastchat">角色ID:{{item.Id}}</div>
                         </div>
                     </div>
                 </div>
@@ -56,20 +56,20 @@
                 <!-- target self nohead image statetext -->
                 <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
                     <div v-if="chatitem.type.indexOf('self')==-1" class="userAvatar">
-                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.avatarList[PageState.onSelectStudentData.Id]">
+                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.avatarList[chatitem.slIndex]">
                     </div>
                     <div class="userChatContent" v-if="chatitem.type.indexOf('image')==-1">
-                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
+                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
                         <div class="Content">
                             <div class="decoration_triangle"></div>
                             <div class="chat_Context">{{ chatitem.content }}</div>
                         </div>
                     </div>
                     <div class="userImageContent" v-if="chatitem.type.indexOf('image')!=-1">
-                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
+                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
                         
                         <div class="imageContainer">
-                            <img :src="getImageContent(chatitem.content)">
+                            <img :src="_PD.imageResource[chatitem.content]">
                         </div>
                         
                     </div>
@@ -80,12 +80,12 @@
             <div class="_general_btn" @click="openCreator()">
                 为该角色创建对话
             </div>
-            <!-- <div class="_general_btn" @click="()=>{PageState.isShowCharaCreator=true;PageState.cachedStudentAvatar='';PageState.cachedStudentName='';}">
+            <div class="_general_btn" @click="()=>{PageState.isShowCharaCreator=true;PageState.cachedStudentAvatar='';PageState.cachedStudentName='';PageState.cachedStudentId=getMaxID();PageState.cachedStudentIntro='';}">
                 创建自定义角色
-            </div> -->
-            <div class="_general_btn">
-                仍在开发中的功能
             </div>
+            <!-- <div class="_general_btn">
+                仍在开发中的功能
+            </div> -->
             <div class="_general_btn" @click="exportToImage()">
                 导出图片
             </div>
@@ -100,19 +100,19 @@
                 <!-- <div class="ads">由momotalk模拟器生成,项目地址:https://github.com/Toukaiteio/my_momotalk</div> -->
                 <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
                     <div class="userAvatar" v-if="chatitem.type.indexOf('self')==-1">
-                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.avatarList[PageState.onSelectStudentData.Id]">
+                        <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.avatarList[chatitem.slIndex]">
                     </div>
                     <div class="userChatContent" v-if="chatitem.type.indexOf('image')==-1">
-                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
+                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
                         <div class="Content">
                             <div class="decoration_triangle"></div>
                             <div class="chat_Context">{{ chatitem.content }}</div>
                         </div>
                     </div>
                     <div class="userImageContent" v-if="chatitem.type.indexOf('image')!=-1">
-                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[parseInt(chatitem.slIndex)].Name}}</div>
+                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
                         <div class="imageContainer">
-                            <img :src="getImageContent(chatitem.content)">
+                            <img :src="_PD.imageResource[chatitem.content]">
                         </div>
                         
                     </div>
@@ -174,7 +174,7 @@
                     <div class="inputer_block config">
                         <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">内容: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content" /> </div>
                         <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">类型: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type"/> </div>
-                        <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">角色: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex"/> </div>
+                        <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">ＩＤ: <input type="number" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex"/> </div>
                         <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">延迟: <input type="text" v-model="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].delay"/> </div>
                         <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]&&PageState.isNameChanging==false">
                             姓名: <div class="name_obj"> {{ ( (PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')!=-1)?('老师'):(_PD.studentList[PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex].Name)) }} </div> <div v-if="(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')==-1 && PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex > -1)" @click="PageState.isNameChanging=true;PageState.isAvatarChanging=false;PageState.isAvatarReady=false;PageState.cachedStudentName=((PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')!=-1)?('老师'):(_PD.studentList[PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex].Name));" class="_general_btn"><div class="context">修改</div></div>  </div>
@@ -187,7 +187,7 @@
                             <div v-if="!PageState.isAvatarChanging&&(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')==-1 && PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex > -1)" @click="PageState.isAvatarChanging=true;PageState.isNameChanging=false;PageState.isAvatarReady=false;" class="_general_btn"><div class="context">修改</div></div>
                             <div v-if="PageState.isAvatarReady&&(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')==-1 && PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex > -1)" class="_general_btn" @click="changeStudentAvatar(_PD.studentList[PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex],PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].slIndex)"><div class="context">保存</div></div>
                         </div>
-                        <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">识别: <input :disabled="(typeof _PD.studentList[PageState.onSelectIndex]['custom'] == 'undefined')" type="text" :value="(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')!=-1)?('老师'):(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].sid)"/> </div>
+                        <!-- <div class="inputer_item" v-if="PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected]">识别: <input :disabled="(typeof _PD.studentList[PageState.onSelectIndex]['custom'] == 'undefined')" type="text" :value="(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('self')!=-1)?('老师'):(PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].sid)"/> </div> -->
                         <input type="file" class="image_inputer image" v-if="!PageState.isAvatarChanging&&PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].type.indexOf('image')!=-1" @change="image_dragin"/>
                         <input type="file" class="image_inputer avatar" v-if="PageState.isAvatarChanging" @change="image_dragin_changeAvatar"/>
                     </div>
@@ -239,38 +239,47 @@
         <div class="window_wrapper">
             <div class="header">
                <div>CHARA-CREATOR</div>
-               <div class="close" @click="()=>{PageState.isShowCharaCreator=false;PageState.cachedStudentAvatar='';PageState.cachedStudentName='';}"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></div>
+               <div class="close" @click="()=>{PageState.isShowCharaCreator=false;PageState.cachedStudentAvatar='';PageState.cachedStudentId=getMaxID();PageState.cachedStudentIntro='';PageState.cachedStudentName='';PageState.cachedStudentBirth='';}"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></div>
             </div>
             <div class="mainbox">
-                <div class="chara_inputer_block config">
+                <div class="inputer_wrapper">
+                    <div class="chara_inputer_block config">
                     <div class="preview_block">
-                        头像: <div class="avatar"><img src=""></div>
+                        角色头像: <div class="avatar"><img :src="PageState.cachedStudentAvatar"></div>
                     </div>
                     <div class="preview_block">
-                        <div class="inputer_item">姓名:
+                        <div class="inputer_item">角色姓名:
                             <input type="text" v-model="PageState.cachedStudentName" />
                         </div>
                     </div>
                     <div class="preview_block">
-                        <div class="inputer_item">简介:
+                        <div class="inputer_item">角色简介:
                             <input type="text" v-model="PageState.cachedStudentIntro" />
                         </div>
                     </div>
                     <div class="preview_block">
-                        <div class="inputer_item">识别:
-                            <input type="text" v-model="PageState.cachedStudentId" />
+                        <div class="inputer_item">生日(X月X日):
+                            <input type="text" v-model="PageState.cachedStudentBirth" />
+                        </div>
+                    </div>
+                    <div class="preview_block">
+                        <div class="inputer_item">ID(值>=40000):
+                            <input type="number" v-model="PageState.cachedStudentId" />
                         </div>
                     </div>
                 </div>
-                <div class="chara_inputer_block">TEST</div>
+                <div class="chara_inputer_block config">
+                    <input type="file" class="image_inputer avatar" @change="image_dragin_createAvatar"/>
+                </div>
+                </div>
             </div>
             <div class="btns">
                     <div class="_general_btn">
-                        <div class="context">
+                        <div class="context" @click="confirm_create_chara">
                             确定
                         </div>
                     </div>
-                    <div class="_general_btn" @click="()=>{PageState.isShowCharaCreator=false;PageState.cachedStudentAvatar='';}">
+                    <div class="_general_btn" @click="()=>{PageState.isShowCharaCreator=false;PageState.cachedStudentAvatar='';PageState.cachedStudentId=getMaxID();PageState.cachedStudentIntro='';PageState.cachedStudentName='';PageState.cachedStudentBirth='';}">
                         <div class="context">
                             取消
                         </div>
@@ -304,6 +313,8 @@ const PageState=reactive({
     cachedStudentAvatar:"",
     cachedStudentIntro:"",
     cachedStudentId:"",
+    cachedStudentBirth:"",
+    
 });
 const hardChangeSelect=(n)=>{
     if(n>=0 && n<PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].length){
@@ -464,41 +475,64 @@ const showControlBar=()=>{
         setTimeout(()=>{PageState.mouseClickTimes=0},700);
     }
 }
-const getImageContent=(ori)=>{
-    if(ori[0]=="#"){
-        return localStorage.getItem(ori.replace("#",""));
-    }else{
-        return ori;
-    }
-}
-const save_to_data_bucket=(size,content)=>{
-    if(content.length<=5000000){
+
+// async function db_is_stored(key){
+//     const sleep=(time)=>{
+//         return new Promise(resolve => setTimeout(resolve, time))
+//     }
+//     let _f=false,_r=false;
+//     _PD.DBStorage_getItem(key,(_v)=>{
+//         _f=true;
+//         if(_v!=undefined){
+//             _r=_v;
+//         }
+//     });
+//     while(!_f){
+//         await sleep(250);
+//     }
+//     return _r;
+// }
+async function save_to_data_bucket(size,content){
+    if(content.length<=10000000){
         const _type=content.split(";")[0].split(":")[1];
         const _bucket_id=size.toString()+"_"+_type;
-        const _ck=localStorage.getItem(_bucket_id);
-        if(_ck==null){
-            localStorage.setItem(_bucket_id,content);
-            PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}`
-        }else{
-            if(_ck!=content){
-                let _counter=1;
-                while(localStorage.getItem(_bucket_id+`_${_counter}`)!=null){
-                    const _ck_sub=localStorage.getItem(_bucket_id+`_${_counter}`);
-                    if(_ck_sub==content){
-                        PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}_${_counter}`
-                        _counter=-2;
-                        break;
-                    }
-                    _counter+=1;
-                }
-                if(_counter>0){
-                    localStorage.setItem(_bucket_id+`_${_counter}`,content);
-                    PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}_${_counter}`
-                }
-            }else{
+        // const _ck=localStorage.getItem(_bucket_id);
+        _PD.DBStorage_getItem(_bucket_id,(_ck)=>{
+            if(_ck==undefined){
+                // localStorage.setItem(_bucket_id,content);
+                _PD.DBStorage_setItem(_bucket_id,content);
                 PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}`
+                
+                let _t_iRL=localStorage.getItem('imageResourceList');
+                if(_t_iRL==null){
+                    _t_iRL=[];
+                }else{
+                    _t_iRL=JSON.parse(_t_iRL);
+                }
+                _t_iRL.push(_bucket_id);
+                _PD.image_attach('#'+_bucket_id,content);
+                localStorage.setItem('imageResourceList',JSON.stringify(_t_iRL));
+            }else{
+                if(_ck.imageData!=content){
+                    const _t_id_time=new Date();
+                    const _t_id=_t_id_time.getTime().toString().slice(3,10);
+                    _PD.DBStorage_setItem(_bucket_id+`_${_t_id}`,content);
+                    PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}_${_t_id}`
+                    let _t_iRL=localStorage.getItem('imageResourceList');
+                    if(_t_iRL==null){
+                        _t_iRL=[];
+                    }else{
+                        _t_iRL=JSON.parse(_t_iRL);
+                    }
+                    _t_iRL.push(_bucket_id+`_${_t_id}`);
+                    _PD.image_attach('#'+_bucket_id+`_${_t_id}`,content);
+                    localStorage.setItem('imageResourceList',JSON.stringify(_t_iRL));
+                    }else{
+                        PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()][PageState.preChatOnSelected].content=`#${_bucket_id}`
+                }
             }
-        }
+        })
+        
     }else{
         alert("图片过大!请尝试压缩图片或降低图片分辨率! :(")
     }
@@ -519,13 +553,26 @@ const image_dragin_changeAvatar=(e)=>{
     const _tFR=new FileReader();
     _tFR.readAsDataURL(_file);
     _tFR.onload=(E)=>{
-        if(E.target.result<=5000000){
+        if(E.target.result.length<=10000000){
             PageState.cachedStudentAvatar=E.target.result;
             PageState.isAvatarReady=true;
         }else{
             alert("图片过大!");
         }
-        
+        // PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].content=
+    }
+}
+const image_dragin_createAvatar=(e)=>{
+    // console.log(e);
+    const _file=e.target.files[0];
+    const _tFR=new FileReader();
+    _tFR.readAsDataURL(_file);
+    _tFR.onload=(E)=>{
+        if(E.target.result.length<=10000000){
+            PageState.cachedStudentAvatar=E.target.result;
+        }else{
+            alert("图片过大!");
+        }
         // PageState.preChatFlow[PageState.onSelectStudentData.Id.toString()].content=
     }
 }
@@ -542,6 +589,60 @@ const changeStudentName=(_sObj,lid)=>{
     PageState.isNameChanging=false;
     PageState.isAvatarChanging=false;
     PageState.isAvatarReady=false;
+}
+const getMaxID=()=>{
+    let _t_mI=localStorage.getItem("maxID");
+    if(_t_mI==null){
+        _t_mI='40000';
+        localStorage.setItem("maxID",40000)
+    }
+    return _t_mI;
+}
+const confirm_create_chara=()=>{
+    let _t_cC=localStorage.getItem("createdChara");
+    let _t_mI=PageState.cachedStudentId;
+    if(_t_mI>=40000){
+        localStorage.setItem("maxID",_t_mI+1);
+        if(PageState.cachedStudentId==""||PageState.cachedStudentName==""||PageState.cachedStudentIntro==""||PageState.cachedStudentBirth==""||PageState.cachedStudentAvatar==""){
+            alert("不应有项被留空！");
+            return;
+        }
+        const _t_sD={
+            "Id":PageState.cachedStudentId,
+            "Name":PageState.cachedStudentName,
+            "Birthday":PageState.cachedStudentBirth,
+            "Avatar":[PageState.cachedStudentAvatar],
+            "Bio":PageState.cachedStudentIntro,
+            "custom":"1"
+        };
+        if(_t_cC==null){
+            _t_cC=[];
+            localStorage.setItem("createdChara","[]");
+        }else{
+            if(_t_cC.indexOf(_t_mI.toString())!=-1){
+                alert("ID已被占用!")
+                return;
+            }else{
+                _t_cC=JSON.parse(_t_cC);
+            }
+        }
+        localStorage.setItem("createdChara",JSON.stringify([..._t_cC,_t_mI]));
+        localStorage.setItem(`${PageState.cachedStudentId}_custom`,JSON.stringify(_t_sD));
+        _PD.pushCustomStudent(_t_sD);
+        _PD.addToAvatarList(PageState.cachedStudentId,PageState.cachedStudentAvatar);
+        PageState.isShowCharaCreator=false;
+        PageState.cachedStudentAvatar='';
+        PageState.cachedStudentId=getMaxID();
+        PageState.cachedStudentIntro='';
+        PageState.cachedStudentName='';
+        PageState.cachedStudentBirth='';
+        return;
+    }else{
+        alert("识别应该是一个>=40000的整数!");
+        
+        return;
+    }
+    
 }
 const changeStudentAvatar=(_sObj,lid)=>{
     // _sObj["Name"]=PageState.cachedStudentName;
@@ -659,7 +760,10 @@ $titleFontColor:#FFFFFF;
                     .preview_block{
                         height: 50px;
                         width: 100%;
+                        display: flex;
+                        align-items: center;
                         .avatar{
+                            // display: inline-block;
                             height: 100%;
                             aspect-ratio: 1 / 1;
                             img{

@@ -64,11 +64,20 @@
   const PageStateObj=reactive({
     isDefaultPage:true,
   })
-  if(localStorage.getItem("isup")!=null){
-    if(localStorage.getItem("isup")=="1"){
-      _PD.enableUnpullableStudent();
-    }
-  }
+  // if(localStorage.getItem("isup")!=null){
+  //   if(localStorage.getItem("isup")=="1"){
+  //     _PD.enableUnpullableStudent();
+  //   }
+  // }
+  _PD.store_init();
+  // const sleep=(time)=>{
+  //     return new Promise(resolve => setTimeout(resolve, time))
+  // }
+  // while(!_PD.isDBReady){
+  //       console.log("WARNING:DB IS NOT READY!")
+  //       await sleep(500);
+  // }
+  // console.log("DB HAS LOADED!");
   const goPage=(_v)=>{
 
     if(PageStateObj.isDefaultPage!=_v){
@@ -84,29 +93,36 @@
         _t="jpeg";
     }
     const _n=tnA[0];
-    const _item=localStorage.getItem(_n);
-    if(_item==null){
-    let canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      let img = new Image()
-      img.crossOrigin = 'Anonymous'
-      img.src = url
-      img.onload = function() {
-        canvas.height = img.height / 2;
-        canvas.width = img.width / 2;
-        ctx.drawImage(img, 0, 0, img.width / 2, img.height / 2)
-        const dataURL = canvas.toDataURL(`image/${_t}`, 1)
-        localStorage.setItem(_n,dataURL);
-        resolve(dataURL)
-        canvas = null
-        img = null
-      }
-      img.onerror = function() {
-            reject(url);
+    // const _item=localStorage.getItem(_n);
+    // console.log("getting",_n)
+    _PD.DBStorage_getItem(_n,(_v)=>{
+      // console.log(_v);
+      if(_v==undefined){
+        // console.log("undefined fun");
+        let canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')
+          let img = new Image()
+          img.crossOrigin = 'Anonymous'
+          img.src = url
+          img.onload = function() {
+            canvas.height = img.height / 2;
+            canvas.width = img.width / 2;
+            ctx.drawImage(img, 0, 0, img.width / 2, img.height / 2)
+            const dataURL = canvas.toDataURL(`image/${_t}`, 1)
+            // localStorage.setItem(_n,dataURL);
+            _PD.DBStorage_setItem(_n,dataURL);
+            resolve(dataURL)
+            canvas = null
+            img = null
+          }
+          img.onerror = function() {
+                reject(url);
+            }
+        }else{
+            resolve(_v.imageData)
         }
-    }else{
-        resolve(_item)
-    }
+    })
+    
 })}
 async function avatarLoader(url,id){
     await imageLoader(url).then(value=>{
@@ -119,21 +135,28 @@ async function avatarLoader(url,id){
     })
     return "looped";
 }
-{
+const _c_sID=setInterval(()=>{if(_PD.isDBReady){
+  const _t_iRL=localStorage.getItem('imageResourceList');
+  if(_t_iRL!=null){
+    for(let __i__ of JSON.parse(_t_iRL)){
+      _PD.DBStorage_getItem(__i__,(_v)=>{
+        _PD.image_attach('#'+__i__,_v.imageData);
+        console.log(_PD.imageResource);
+      })
+    }
+  }
   const _t_cC=localStorage.getItem("createdChara");
   if(_t_cC!=null){
     for(let __i__ of JSON.parse(_t_cC)){
-      const _t_sObj=JSON.parse(localStorage.getItem(__i__));
+      const _t_sObj=JSON.parse(localStorage.getItem(`${__i__}_custom`));
       if(typeof _t_sObj["custom"] != "undefined"){
         _PD.pushCustomStudent(_t_sObj);
       }
-
     }
   }
 
-  let _t_counter=0;
-  for(let __s__ of _PD.studentList){
-    const _t_sc=localStorage.getItem(`${__s__.Id}_custom`);
+  for(let __s__ in _PD.studentList){
+    const _t_sc=localStorage.getItem(`${_PD.studentList[__s__].Id}_custom`);
     if(_t_sc!=null){
       const _t_d=JSON.parse(_t_sc);
       // if(typeof _t_d["custom"] != 'undefined'){
@@ -141,13 +164,16 @@ async function avatarLoader(url,id){
       // }else{
       // avatarLoader(_t_d.Avatar[0],_t_d.Id);
       // }
-      _PD.changeBaseCustomedStudent(_t_d,_t_counter,1);
+      _PD.changeBaseCustomedStudent(_t_d,_t_d['Id'],1);
     }else{
-      avatarLoader(__s__.Avatar[0],__s__.Id);
+      avatarLoader(_PD.studentList[__s__].Avatar[0],_PD.studentList[__s__].Id);
     }
-    _t_counter+=1;
   }
-}
+  clearInterval(_c_sID);
+  console.log("INIT DONE!");
+}}
+,200)
+
 </script>
 <style lang="scss">
 $windowBarBgColor:#FC8DA2;
@@ -294,6 +320,9 @@ $generalBtnFontColor:#696D6F;
   justify-content: center;
   align-items: center;
   color: $generalBtnFontColor !important;
+  word-break: keep-all;
+  text-overflow: ellipsis;
+  // overflow: hidden;
   filter: drop-shadow(-2px 3px 4px lightgray);
   *{
     transform: skewX(12deg);
