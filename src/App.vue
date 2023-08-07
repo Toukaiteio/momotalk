@@ -83,7 +83,7 @@
     if(PageStateObj.isDefaultPage!=_v){
       PageStateObj.isDefaultPage=_v;
     }
-    console.log(PageStateObj.isDefaultPage)
+    // console.log(PageStateObj.isDefaultPage)
   }
   const imageLoader=(url)=>{return new Promise((resolve, reject)=>{
     const _oriDataArray=url.split("/");
@@ -141,7 +141,7 @@ const _c_sID=setInterval(()=>{if(_PD.isDBReady){
     for(let __i__ of JSON.parse(_t_iRL)){
       _PD.DBStorage_getItem(__i__,(_v)=>{
         _PD.image_attach('#'+__i__,_v.imageData);
-        console.log(_PD.imageResource);
+        // console.log(_PD.imageResource);
       })
     }
   }
@@ -177,7 +177,7 @@ const _c_sID=setInterval(()=>{if(_PD.isDBReady){
     
   }
   clearInterval(_c_sID);
-  console.log("INIT DONE!");
+  // console.log("INIT DONE!");
 }}
 ,100)
 

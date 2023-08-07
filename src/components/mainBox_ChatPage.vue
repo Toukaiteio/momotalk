@@ -654,7 +654,7 @@ const changeStudentAvatar=(_sObj,lid)=>{
     if(lid=='0'){
         delete _sObj["decalration"];
     }
-    console.log(_sObj,lid);
+    // console.log(_sObj,lid);
     _PD.changeBaseCustomedStudent(_sObj,lid);
     PageState.isNameChanging=false;
     PageState.isAvatarChanging=false;
