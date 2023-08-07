@@ -1349,10 +1349,10 @@ $titleFontColor:#FFFFFF;
                     padding-left: 8px;
                     padding-right: 24px;
                     .decoration_triangle{
-                            left: -4px;
-                            border:12px solid $chatBubbleTargetBgColor;
-                            border-bottom:4px solid transparent;
-                            border-top:4px solid transparent;
+                            left: 0px;
+                            border:8px solid $chatBubbleTargetBgColor;
+                            border-bottom:5px solid transparent;
+                            border-top:5px solid transparent;
                             border-left:1px solid transparent;
                         }
                         .chat_Context{
@@ -1387,11 +1387,11 @@ $titleFontColor:#FFFFFF;
                             position: absolute;
                             width: 0;
                             height: 0;
-                            top: 12px;
-                            right: -4px;
-                            border:12px solid $chatBubbleSelfBgColor;
-                            border-bottom:4px solid transparent;
-                            border-top:4px solid transparent;
+                            top: 10px;
+                            right: 0px;
+                            border:8px solid $chatBubbleSelfBgColor;
+                            border-bottom:6px solid transparent;
+                            border-top:6px solid transparent;
                             border-right:1px solid transparent;
                             border-left: 12px solid $chatBubbleSelfBgColor;
                         }
@@ -1616,10 +1616,10 @@ $titleFontColor:#FFFFFF;
                 padding-left: 8px;
                 padding-right: 24px;
                 .decoration_triangle{
-                        left: -4px;
-                        border:12px solid $chatBubbleTargetBgColor;
-                        border-bottom:4px solid transparent;
-                        border-top:4px solid transparent;
+                        left: 0px;
+                        border:8px solid $chatBubbleTargetBgColor;
+                        border-bottom:5px solid transparent;
+                        border-top:5px solid transparent;
                         border-left:1px solid transparent;
                     }
                     .chat_Context{
@@ -1654,11 +1654,11 @@ $titleFontColor:#FFFFFF;
                         position: absolute;
                         width: 0;
                         height: 0;
-                        top: 12px;
-                        right: -4px;
-                        border:12px solid $chatBubbleSelfBgColor;
-                        border-bottom:4px solid transparent;
-                        border-top:4px solid transparent;
+                        top: 8px;
+                        right: 0;
+                        border:8px solid $chatBubbleSelfBgColor;
+                        border-bottom:6px solid transparent;
+                        border-top:6px solid transparent;
                         border-right:1px solid transparent;
                         border-left: 12px solid $chatBubbleSelfBgColor;
                     }
