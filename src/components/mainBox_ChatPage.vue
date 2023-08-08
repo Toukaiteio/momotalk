@@ -55,18 +55,18 @@
             <div class="chat_ContentContainer"  v-if="PageState.onSelectIndex!=-1 && (typeof PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()] != 'undefined') ">
                 <!-- target self nohead image statetext -->
                 <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
-                    <div v-if="chatitem.type.indexOf('self')==-1" class="userAvatar">
+                    <div v-if="chatitem.type.indexOf('self')==-1&&chatitem.type.indexOf('statetext')==-1" class="userAvatar">
                         <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.avatarList[chatitem.slIndex]">
                     </div>
                     <div class="userChatContent" v-if="chatitem.type.indexOf('image')==-1">
-                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
+                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1&&chatitem.type.indexOf('statetext')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
                         <div class="Content">
                             <div class="decoration_triangle"></div>
                             <div class="chat_Context">{{ chatitem.content }}</div>
                         </div>
                     </div>
                     <div class="userImageContent" v-if="chatitem.type.indexOf('image')!=-1">
-                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
+                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1&&chatitem.type.indexOf('statetext')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
                         
                         <div class="imageContainer">
                             <img :src="_PD.imageResource[chatitem.content]">
@@ -99,18 +99,18 @@
                 <!-- target self nohead image statetext -->
                 <!-- <div class="ads">由momotalk模拟器生成,项目地址:https://github.com/Toukaiteio/my_momotalk</div> -->
                 <div class="chat_BaseObject" v-for="(chatitem,chatindex) in PageState.onChatFlow[PageState.onSelectStudentData.Id.toString()]" :key="chatindex"  :class="isNohead(chatitem.type,chatindex)">
-                    <div class="userAvatar" v-if="chatitem.type.indexOf('self')==-1">
+                    <div class="userAvatar" v-if="chatitem.type.indexOf('self')==-1&&chatitem.type.indexOf('statetext')==-1">
                         <img v-if="parseInt(chatitem.slIndex)>-1" :src="_PD.avatarList[chatitem.slIndex]">
                     </div>
                     <div class="userChatContent" v-if="chatitem.type.indexOf('image')==-1">
-                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
+                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1&&chatitem.type.indexOf('statetext')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
                         <div class="Content">
                             <div class="decoration_triangle"></div>
                             <div class="chat_Context">{{ chatitem.content }}</div>
                         </div>
                     </div>
                     <div class="userImageContent" v-if="chatitem.type.indexOf('image')!=-1">
-                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
+                        <div class="userName" v-if="chatitem.type.indexOf('self')==-1&&chatitem.type.indexOf('statetext')==-1">{{_PD.studentList[chatitem.slIndex].Name}}</div>
                         <div class="imageContainer">
                             <img :src="_PD.imageResource[chatitem.content]">
                         </div>
